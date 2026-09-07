@@ -37,11 +37,11 @@
       x-data="macroDashboard()">
 
     <!-- Top Navigation Header (Exact POSCafe Standard) -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex items-center justify-between">
             <!-- Brand & App Identity -->
-            <div class="flex items-center gap-4">
-                <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-extrabold text-lg shadow-sm tracking-tight">
+            <div class="flex items-center gap-3.5 sm:gap-4">
+                <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-extrabold text-lg shadow-sm tracking-tight shrink-0">
                     MS
                 </div>
                 <div>
@@ -85,68 +85,68 @@
         </div>
     @endif
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-12 flex flex-col gap-10">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 pb-16 flex flex-col gap-8 sm:gap-10">
 
-        <!-- 4 Stat Cards Grid (Identical to POSCafe StatCard Pattern) -->
+        <!-- 4 Stat Cards Grid (Unified 4-column on desktop & split-screen) -->
         @php
             $resilientCount = $sectorResults->where('impact_score', '>', 0)->count();
             $vulnerableCount = $sectorResults->where('impact_score', '<', 0)->count();
             $neutralCount = $sectorResults->where('impact_score', 0)->count();
         @endphp
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
             <!-- StatCard 1 -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:border-slate-300 transition-all flex items-center justify-between">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 transition-all flex items-center justify-between">
                 <div>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Cakupan Sektor</p>
                     <p class="text-2xl font-bold text-slate-900">11 Sektor</p>
-                    <p class="text-[11px] text-slate-400 mt-1 font-medium">100% Klasifikasi Resmi IDX-IC</p>
+                    <p class="text-[11px] text-slate-400 mt-1 font-medium truncate">100% Klasifikasi Resmi</p>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0 border border-blue-200 text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0 border border-blue-200 text-blue-600">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                     </svg>
                 </div>
             </div>
 
             <!-- StatCard 2 -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:border-slate-300 transition-all flex items-center justify-between">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 transition-all flex items-center justify-between">
                 <div>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Sektor Tangguh</p>
                     <p class="text-2xl font-bold text-emerald-600">{{ $resilientCount }} Sektor</p>
-                    <p class="text-[11px] text-emerald-600 mt-1 font-medium">Skor Transmisi Positif (+)</p>
+                    <p class="text-[11px] text-emerald-600 mt-1 font-medium truncate">Skor Transmisi Positif (+)</p>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-200 text-emerald-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-200 text-emerald-600">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                     </svg>
                 </div>
             </div>
 
             <!-- StatCard 3 -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:border-slate-300 transition-all flex items-center justify-between">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 transition-all flex items-center justify-between">
                 <div>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Sektor Rentan</p>
                     <p class="text-2xl font-bold text-rose-600">{{ $vulnerableCount }} Sektor</p>
-                    <p class="text-[11px] text-rose-600 mt-1 font-medium">Skor Transmisi Negatif (-)</p>
+                    <p class="text-[11px] text-rose-600 mt-1 font-medium truncate">Skor Transmisi Negatif (-)</p>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center shrink-0 border border-rose-200 text-rose-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-rose-50 flex items-center justify-center shrink-0 border border-rose-200 text-rose-600">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
                     </svg>
                 </div>
             </div>
 
             <!-- StatCard 4 -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:border-slate-300 transition-all flex items-center justify-between">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 transition-all flex items-center justify-between">
                 <div>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Driver Makro</p>
-                    <p class="text-base font-bold text-slate-900 truncate max-w-[150px] capitalize">
+                    <p class="text-xl sm:text-2xl font-bold text-slate-900 truncate max-w-[130px] capitalize">
                         {{ str_replace('_', ' ', $activeScenario?->category ?? 'Makro Global') }}
                     </p>
-                    <p class="text-[11px] text-slate-400 mt-1 font-medium">Kategori Transmisi Aktif</p>
+                    <p class="text-[11px] text-slate-400 mt-1 font-medium truncate">Kategori Transmisi Aktif</p>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-200 text-amber-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-200 text-amber-600">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
