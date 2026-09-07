@@ -65,4 +65,12 @@ class MacroAnalysisTest extends TestCase
 
         $response->assertRedirect(route('dashboard'));
     }
+
+    public function test_upload_preview_page_renders_successfully(): void
+    {
+        $response = $this->get('/upload-preview');
+
+        $response->assertStatus(200);
+        $response->assertSee('Kirim Screenshot Preview');
+    }
 }
