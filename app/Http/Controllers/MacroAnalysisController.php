@@ -9,6 +9,7 @@ use App\Services\MacroReasoningService;
 use App\Services\SectorsApiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class MacroAnalysisController extends Controller
@@ -94,6 +95,33 @@ class MacroAnalysisController extends Controller
                 ->sortByDesc('impact_score');
         }
 
+        $sectorsPayload = [];
+        if (isset($sectorResults) && $sectorResults instanceof Collection) {
+            foreach ($sectorResults as $r) {
+                $sectorsPayload[$r->sector->sector_code] = [
+                    'code' => $r->sector->sector_code,
+                    'name' => $r->sector->sector_name,
+                    'score' => $r->impact_score,
+                    'status' => $r->resilience_status,
+                    'reasoning' => $r->reasoning,
+                    'avg_der' => (float) $r->sector->avg_der,
+                    'avg_npm' => (float) $r->sector->avg_npm,
+                    'vulnerable_companies' => $r->vulnerable_companies ?? [],
+                    'beneficiary_companies' => $r->beneficiary_companies ?? [],
+                    'companies' => $r->sector->companies->map(fn ($c) => [
+                        'id' => $c->id,
+                        'symbol' => $c->symbol,
+                        'name' => $c->name,
+                        'market_cap' => $c->market_cap,
+                        'pe_ratio' => $c->pe_ratio,
+                        'pbv_ratio' => $c->pbv_ratio,
+                        'der' => $c->der,
+                        'npm' => $c->npm,
+                    ])->values()->toArray(),
+                ];
+            }
+        }
+
         $allSectors = SectorCache::with('companies')->get();
         $isSectorsApiConfigured = $this->sectorsApiService->isConfigured();
 
@@ -103,6 +131,7 @@ class MacroAnalysisController extends Controller
             'activeScenario' => $activeScenario,
             'analysisData' => $analysisData,
             'sectorResults' => $sectorResults,
+            'sectorsJson' => json_encode($sectorsPayload),
             'allSectors' => $allSectors,
             'isSectorsApiConfigured' => $isSectorsApiConfigured,
         ]);
