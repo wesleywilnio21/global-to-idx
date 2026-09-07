@@ -85,7 +85,7 @@
         </div>
     @endif
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-12 flex flex-col gap-10">
 
         <!-- 4 Stat Cards Grid (Identical to POSCafe StatCard Pattern) -->
         @php
@@ -424,24 +424,26 @@
             </div>
         </div>
 
-        <!-- Regulatory & Risk Disclaimer -->
-        <footer class="mt-4 pt-8 pb-20 border-t border-slate-200 text-xs text-slate-500 flex flex-col gap-3">
-            <div class="flex items-center gap-2 text-slate-700 font-semibold">
-                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    </main>
+
+    <!-- Regulatory & Risk Disclaimer Footer (Dedicated Spacious Section) -->
+    <footer class="border-t border-slate-200 bg-white/60 backdrop-blur-xs py-14 mt-12 mb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 text-xs text-slate-500">
+            <div class="flex items-center gap-2 text-slate-700 font-bold text-sm tracking-wide">
+                <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                 </svg>
                 <span>LEGAL & INVESTMENT RISK DISCLAIMER</span>
             </div>
-            <p class="leading-relaxed">
+            <p class="leading-relaxed text-slate-600 max-w-4xl text-xs">
                 Platform <strong>MacroSectors AI</strong> dirancang sebagai instrumen simulasi analitik kuantitatif pasar modal untuk riset. Seluruh luaran, skor dampak, dan sintesis naratif bukan merupakan anjuran transaksi efek, rekomendasi jual/beli saham, atau nasihat keuangan legal dalam yurisdiksi Republik Indonesia.
             </p>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-slate-400 pt-4 border-t border-slate-200/80 gap-2">
                 <span>© 2026 MacroSectors AI • Author: Wesley Wilnio • Sectors Hackathon Indonesia 2026</span>
                 <span>Powered by Sectors REST API & Fundamental Ratios Cache</span>
             </div>
-        </footer>
-
-    </main>
+        </div>
+    </footer>
 
     <!-- Alpine.js Logic -->
     <script>
