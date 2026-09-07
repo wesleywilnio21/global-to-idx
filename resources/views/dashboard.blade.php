@@ -1,351 +1,364 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id" class="dark h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MacroSectors AI — Indonesia Capital Market Intelligence</title>
+    <title>MacroSectors Terminal — IDX Market Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        .font-mono-num {
+        .num-tabular {
             font-family: 'Geist Mono', monospace;
             font-variant-numeric: tabular-nums;
         }
+        /* Custom thin scrollbar for financial terminal density */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-emerald-500 selection:text-slate-950" x-data="{ selectedSector: null, customModal: false }">
+<body class="bg-slate-950 text-slate-200 h-full flex flex-col antialiased selection:bg-emerald-500 selection:text-slate-950 overflow-hidden" 
+      x-data="{ 
+          selectedSectorCode: '{{ $sectorResults->first()?->sector->sector_code ?? 'IDX-ENERGY' }}',
+          sectors: {{ json_encode($sectorResults->mapWithKeys(fn($r) => [$r->sector->sector_code => [
+              'code' => $r->sector->sector_code,
+              'name' => $r->sector->sector_name,
+              'score' => $r->impact_score,
+              'status' => $r->resilience_status,
+              'reasoning' => $r->reasoning,
+              'avg_der' => $r->sector->avg_der,
+              'avg_npm' => $r->sector->avg_npm,
+              'vulnerable_companies' => $r->vulnerable_companies ?? [],
+              'beneficiary_companies' => $r->beneficiary_companies ?? [],
+              'companies' => $r->sector->companies
+          ]])) }},
+          get activeSector() {
+              return this.sectors[this.selectedSectorCode] || null;
+          }
+      }">
 
-    <!-- Top Navigation -->
-    <header class="border-b border-slate-800/80 bg-slate-900/90 sticky top-0 z-30 backdrop-blur-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono-num font-bold text-base">
-                    MS
+    <!-- Institutional Top Ribbon & Ticker -->
+    <header class="border-b border-slate-800 bg-slate-950 px-4 py-2 flex items-center justify-between shrink-0 select-none">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center text-slate-950 font-bold text-[11px] num-tabular">
+                    M
                 </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold text-slate-100 tracking-tight text-lg">MacroSectors <span class="text-emerald-400">AI</span></span>
-                        <span class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-slate-800 text-slate-300 rounded border border-slate-700">Track 3: Market Intelligence</span>
-                    </div>
-                    <p class="text-xs text-slate-400 hidden sm:block">Macro-to-Micro Sector Resilience Engine • Indonesia Capital Market (IHSG)</p>
+                <div class="flex items-baseline gap-2">
+                    <span class="font-bold text-sm text-slate-100 tracking-tight">MACRO<span class="text-emerald-400">SECTORS</span></span>
+                    <span class="text-[10px] num-tabular text-slate-400 tracking-wider">TERMINAL v1.0</span>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium {{ $isSectorsApiConfigured ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/60' : 'bg-amber-950/60 text-amber-400 border border-amber-800/60' }}">
-                    <span class="w-2 h-2 rounded-full {{ $isSectorsApiConfigured ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse' }}"></span>
-                    <span class="font-mono-num text-[11px]">{{ $isSectorsApiConfigured ? 'Sectors API: Live' : 'Sectors Cache: 11 Sectors Ready' }}</span>
-                </div>
+            <div class="h-3 w-px bg-slate-800"></div>
 
-                <form action="{{ route('sectors.sync') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
-                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        <span>Sync Sectors</span>
-                    </button>
-                </form>
+            <!-- Macro Indicators Strip -->
+            <div class="hidden md:flex items-center gap-4 text-[11px] num-tabular">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-slate-400">USD/IDR:</span>
+                    <span class="text-slate-200 font-semibold">16.285</span>
+                    <span class="text-rose-400 text-[10px]">+0.42%</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-slate-400">BI-RATE:</span>
+                    <span class="text-slate-200 font-semibold">6.25%</span>
+                    <span class="text-slate-400 text-[10px]">UNCH</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-slate-400">BRENT:</span>
+                    <span class="text-slate-200 font-semibold">$84.10</span>
+                    <span class="text-emerald-400 text-[10px]">+1.15%</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-slate-400">IND10Y:</span>
+                    <span class="text-slate-200 font-semibold">6.89%</span>
+                    <span class="text-rose-400 text-[10px]">+2 bps</span>
+                </div>
             </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] num-tabular bg-slate-900 border border-slate-800">
+                <span class="w-1.5 h-1.5 rounded-full {{ $isSectorsApiConfigured ? 'bg-emerald-400' : 'bg-emerald-500' }}"></span>
+                <span class="text-slate-300">{{ $isSectorsApiConfigured ? 'Sectors API: Connected' : 'Sectors Cache: 11 Sectors Loaded' }}</span>
+            </div>
+
+            <form action="{{ route('sectors.sync') }}" method="POST">
+                @csrf
+                <button type="submit" title="Sync snapshot data from Sectors REST API" 
+                        class="px-2.5 py-1 text-[11px] num-tabular font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded transition flex items-center gap-1.5">
+                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Snapshot Sync</span>
+                </button>
+            </form>
         </div>
     </header>
 
-    @if(session('success'))
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-            <div class="p-3 bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-sm rounded-lg flex items-center justify-between">
-                <span>{{ session('success') }}</span>
-                <span class="text-xs text-emerald-400">Tersinkron</span>
-            </div>
-        </div>
-    @elseif(session('info'))
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-            <div class="p-3 bg-slate-900 border border-slate-800 text-slate-300 text-sm rounded-lg flex items-center justify-between">
-                <span>{{ session('info') }}</span>
-                <span class="text-xs text-slate-400">Info</span>
-            </div>
-        </div>
-    @endif
+    <!-- Main Workspace (Split View) -->
+    <div class="flex-1 flex overflow-hidden">
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-
-        <!-- Macro Scenario Control Panel -->
-        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-slate-800">
-                <div>
-                    <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Macro Disruption Scenario</h2>
-                    <p class="text-lg font-bold text-slate-100 mt-0.5">{{ $activeScenario?->title ?? 'Pilih atau Masukkan Skenario Makro' }}</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs text-slate-400">Kategori:</span>
-                    <span class="px-2 py-0.5 text-xs font-medium rounded bg-slate-800 text-emerald-400 border border-slate-700 capitalize">
-                        {{ str_replace('_', ' ', $activeScenario?->category ?? 'geopolitical') }}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Preset Scenario Chips -->
-            <div class="mt-4">
-                <p class="text-xs font-medium text-slate-400 mb-2">Pilih Skenario Cepat (Preset):</p>
-                <div class="flex flex-wrap gap-2">
-                    @foreach($presetScenarios as $preset)
-                        <a href="{{ route('dashboard', ['scenario_id' => $preset->id]) }}"
-                           class="px-3 py-1.5 rounded-lg text-xs font-medium transition border {{ $activeScenario && $activeScenario->id === $preset->id ? 'bg-emerald-500/15 border-emerald-500/60 text-emerald-300 font-semibold' : 'bg-slate-950 hover:bg-slate-800/80 border-slate-800 text-slate-300' }}">
-                            {{ $preset->title }}
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Custom Scenario Input Form -->
-            <form action="{{ route('analyze') }}" method="POST" class="mt-4 pt-4 border-t border-slate-800/60 flex flex-col sm:flex-row gap-2.5">
-                @csrf
-                <div class="relative flex-1">
-                    <input type="text" name="custom_scenario" placeholder="Atau ketik berita / skenario baru (misal: 'Pemerintah menetapkan PPN 12% dan cukai rokok naik')..."
-                           class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
-                </div>
-                <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition shrink-0 flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-500/20">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                    <span>Analisis Dampak</span>
-                </button>
-            </form>
-        </section>
-
-        <!-- Executive Narrative Panel -->
-        @if($analysisData)
-            <section class="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Executive Briefing</h3>
-                    </div>
-                    <span class="text-[11px] font-mono-num text-slate-400 px-2 py-0.5 bg-slate-950 rounded border border-slate-800">
-                        {{ $analysisData['engine_used'] }}
-                    </span>
-                </div>
-                <p class="text-sm text-slate-200 leading-relaxed font-normal">
-                    {{ $analysisData['executive_summary'] }}
-                </p>
-                <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-2 text-xs text-slate-400">
-                    <span class="font-semibold text-emerald-400">Key Takeaway:</span>
-                    <span>{{ $analysisData['key_takeaway'] }}</span>
-                </div>
-            </section>
-        @endif
-
-        <!-- 11 Sectors Resilience Heatmap -->
-        <section class="space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div>
-                    <h3 class="text-base font-bold text-slate-100 tracking-tight">Peta Ketahanan 11 Sektor IHSG (Resilience Heatmap)</h3>
-                    <p class="text-xs text-slate-400">Skor dampak dari <span class="font-mono-num text-rose-400 font-semibold">-10 (Kritis)</span> hingga <span class="font-mono-num text-emerald-400 font-semibold">+10 (Sangat Diuntungkan)</span>. Klik sektor untuk melihat rincian emiten.</p>
-                </div>
-
-                <!-- Legend -->
-                <div class="flex items-center gap-3 text-xs text-slate-400">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded bg-emerald-500"></span>
-                        <span>Resilient (+1 s/d +10)</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded bg-slate-600"></span>
-                        <span>Netral (0)</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded bg-rose-500"></span>
-                        <span>Vulnerable (-1 s/d -10)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Heatmap Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
-                @forelse($sectorResults as $item)
-                    @php
-                        $score = $item->impact_score;
-                        $isPositive = $score > 0;
-                        $isNegative = $score < 0;
-                        $badgeBg = $isPositive ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60' : ($isNegative ? 'bg-rose-950/50 text-rose-400 border-rose-800/60' : 'bg-slate-800 text-slate-300 border-slate-700');
-                        $scoreBg = $isPositive ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : ($isNegative ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-slate-400 bg-slate-800 border-slate-700');
-                        $barColor = $isPositive ? 'bg-emerald-500' : ($isNegative ? 'bg-rose-500' : 'bg-slate-500');
-                        $barPercent = abs($score) * 10;
-                    @endphp
-
-                    <div @click="selectedSector = {{ json_encode([
-                        'name' => $item->sector->sector_name,
-                        'code' => $item->sector->sector_code,
-                        'score' => $score,
-                        'status' => $item->resilience_status,
-                        'reasoning' => $item->reasoning,
-                        'avg_der' => $item->sector->avg_der,
-                        'avg_npm' => $item->sector->avg_npm,
-                        'companies' => $item->sector->companies,
-                        'vulnerable_companies' => $item->vulnerable_companies ?? [],
-                        'beneficiary_companies' => $item->beneficiary_companies ?? []
-                    ]) }}"
-                         class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-4 transition cursor-pointer hover:shadow-lg hover:-translate-y-0.5 group flex flex-col justify-between">
-                        
-                        <div>
-                            <div class="flex items-start justify-between gap-2 mb-2.5">
-                                <div>
-                                    <span class="text-[10px] font-mono-num uppercase tracking-wider text-slate-400">{{ $item->sector->sector_code }}</span>
-                                    <h4 class="font-bold text-slate-100 text-base group-hover:text-emerald-400 transition">{{ $item->sector->sector_name }}</h4>
-                                </div>
-                                <div class="px-2 py-1 rounded-md border font-mono-num font-bold text-sm {{ $scoreBg }}">
-                                    {{ $score > 0 ? '+' : '' }}{{ $score }}
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="flex items-center justify-between text-[11px] font-mono-num text-slate-400 mb-1">
-                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-medium border {{ $badgeBg }}">{{ $item->resilience_status }}</span>
-                                    <span>DER: {{ $item->sector->avg_der }}x • NPM: {{ $item->sector->avg_npm }}%</span>
-                                </div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
-                                    <div class="h-full {{ $barColor }} rounded-full" style="width: {{ $barPercent }}%"></div>
-                                </div>
-                            </div>
-
-                            <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">
-                                {{ $item->reasoning }}
-                            </p>
-                        </div>
-
-                        <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-                            <span class="font-mono-num text-[11px]">{{ $item->sector->companies->count() }} Emiten Terpantau</span>
-                            <span class="text-emerald-400 font-semibold group-hover:underline flex items-center gap-1 text-[11px]">
-                                Deep Dive
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-                @empty
-                    <div class="col-span-full py-12 text-center bg-slate-900 border border-slate-800 rounded-xl">
-                        <p class="text-slate-400 text-sm">Belum ada hasil analisis untuk skenario ini.</p>
-                    </div>
-                @endforelse
-            </div>
-        </section>
-
-        <!-- Company Exposure Modal / Drawer (Alpine.js) -->
-        <div x-show="selectedSector !== null" 
-             x-cloak
-             class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <!-- LEFT WORKSPACE: Command & Macro Narrative Control (38% Width) -->
+        <aside class="w-full lg:w-[420px] xl:w-[460px] border-r border-slate-800 flex flex-col bg-slate-950 shrink-0">
             
-            <div @click.away="selectedSector = null" 
-                 class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
-                
-                <!-- Modal Header -->
-                <div class="flex items-start justify-between border-b border-slate-800 pb-4">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-xs font-mono-num text-slate-400" x-text="selectedSector?.code"></span>
-                            <span class="px-2 py-0.5 rounded text-xs font-mono-num font-bold"
-                                  :class="selectedSector?.score > 0 ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (selectedSector?.score < 0 ? 'bg-rose-950 text-rose-400 border border-rose-800' : 'bg-slate-800 text-slate-300')">
-                                Impact: <span x-text="(selectedSector?.score > 0 ? '+' : '') + selectedSector?.score"></span>
-                            </span>
-                            <span class="px-2 py-0.5 rounded text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700" x-text="selectedSector?.status"></span>
+            <!-- Command Input Box -->
+            <div class="p-3.5 border-b border-slate-800 bg-slate-900/40">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="text-[10px] uppercase font-mono tracking-wider font-semibold text-slate-400 flex items-center gap-1.5">
+                        <span class="text-emerald-400">&gt;</span> Macro Disruption Engine
+                    </label>
+                    <span class="text-[10px] num-tabular text-slate-400">Press Enter to simulate</span>
+                </div>
+
+                <form action="{{ route('analyze') }}" method="POST">
+                    @csrf
+                    <div class="relative">
+                        <input type="text" name="custom_scenario" 
+                               placeholder="Input headline / what-if scenario..." 
+                               class="w-full bg-slate-950 border border-slate-700/80 rounded px-3 py-2 text-xs text-slate-100 placeholder-slate-400 font-mono-num focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+                    </div>
+                </form>
+
+                <!-- Quick Presets Carousel/List -->
+                <div class="mt-3">
+                    <span class="text-[10px] uppercase font-mono text-slate-400 block mb-1.5">Benchmarked Scenarios:</span>
+                    <div class="space-y-1 max-h-32 overflow-y-auto pr-1">
+                        @foreach($presetScenarios as $preset)
+                            @php
+                                $isActive = $activeScenario && $activeScenario->id === $preset->id;
+                            @endphp
+                            <a href="{{ route('dashboard', ['scenario_id' => $preset->id]) }}" 
+                               class="block px-2.5 py-1.5 rounded text-[11px] transition border {{ $isActive ? 'bg-emerald-950/40 border-emerald-600/80 text-emerald-300 font-medium' : 'bg-slate-900/50 hover:bg-slate-800/80 border-slate-800 text-slate-300' }}">
+                                <div class="flex items-center justify-between">
+                                    <span class="truncate">{{ $preset->title }}</span>
+                                    <span class="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-slate-800 text-slate-400 shrink-0 ml-1.5">{{ $preset->category }}</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <!-- Macro Synthesis & Executive Brief -->
+            <div class="flex-1 p-4 overflow-y-auto space-y-4">
+                <div class="border border-slate-800 rounded bg-slate-900/60 p-3.5 space-y-2.5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Macro Transmit Status</span>
+                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700">
+                            {{ $analysisData['engine_used'] ?? 'MacroSectors AI' }}
+                        </span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-[11px] font-mono uppercase text-slate-400">Current Shock Vector:</span>
+                        <h2 class="text-xs font-bold text-slate-100 leading-snug">
+                            {{ $activeScenario?->title ?? 'Baseline Market Structure' }}
+                        </h2>
+                    </div>
+
+                    <div class="text-[12px] text-slate-300 leading-relaxed font-sans border-t border-slate-800/60 pt-2">
+                        {{ $analysisData['executive_summary'] ?? 'Pilih atau jalankan skenario untuk melihat transmisi dampak ke sektor modal.' }}
+                    </div>
+
+                    @if(isset($analysisData['key_takeaway']))
+                        <div class="bg-slate-950/80 border-l-2 border-emerald-500 p-2 text-[11px] text-slate-300">
+                            <span class="text-emerald-400 font-semibold uppercase text-[10px] font-mono block">Strategic Takeaway:</span>
+                            {{ $analysisData['key_takeaway'] }}
                         </div>
-                        <h3 class="text-xl font-bold text-slate-100" x-text="selectedSector?.name"></h3>
-                    </div>
-                    <button @click="selectedSector = null" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
+                    @endif
                 </div>
 
-                <!-- Sector Economic Reasoning -->
-                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 space-y-2">
-                    <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Transmisi Makro & Rasionalisasi Sektor</h5>
-                    <p class="text-sm text-slate-200 leading-relaxed" x-text="selectedSector?.reasoning"></p>
-                    <div class="flex items-center gap-4 text-xs font-mono-num text-slate-400 pt-2 border-t border-slate-800/60">
-                        <span>Rata-rata DER: <strong class="text-slate-200" x-text="selectedSector?.avg_der + 'x'"></strong></span>
-                        <span>Rata-rata NPM: <strong class="text-slate-200" x-text="selectedSector?.avg_npm + '%'"></strong></span>
+                <!-- Methodology / Transmission Matrix Helper -->
+                <div class="border border-slate-800/80 rounded bg-slate-900/30 p-3 text-[11px] space-y-2 text-slate-400">
+                    <span class="text-[10px] font-mono uppercase text-slate-400 font-semibold block">Scoring Scale Architecture:</span>
+                    <div class="grid grid-cols-3 gap-1.5 text-center num-tabular text-[10px]">
+                        <div class="bg-rose-950/30 border border-rose-900/50 p-1 rounded text-rose-300">
+                            -10 to -6<br><span class="text-[9px] text-rose-400">CRITICAL</span>
+                        </div>
+                        <div class="bg-slate-800/40 border border-slate-700 p-1 rounded text-slate-300">
+                            -5 to +5<br><span class="text-[9px] text-slate-400">VULN / RESILIENT</span>
+                        </div>
+                        <div class="bg-emerald-950/30 border border-emerald-900/50 p-1 rounded text-emerald-300">
+                            +6 to +10<br><span class="text-[9px] text-emerald-400">BENEFICIARY</span>
+                        </div>
                     </div>
+                    <p class="text-[10px] text-slate-400 leading-normal">
+                        Skor dikalkulasi dari relasi sensitivitas utang (DER), marjin kotor (NPM), dan arah arus kas valas terhadap variabel makro.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer Compliance Notice -->
+            <div class="p-3 border-t border-slate-800 text-[10px] text-slate-400 bg-slate-950 shrink-0">
+                <span>Instruksi analitik riset pasar modal. Bukan rekomendasi investasi.</span>
+            </div>
+        </aside>
+
+        <!-- RIGHT WORKSPACE: 11-Sector Resilience Matrix & Docked Inspector (Flex-1) -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-950">
+
+            <!-- UPPER HALF: 11-Sector Matrix Table (Density 9) -->
+            <div class="h-1/2 border-b border-slate-800 flex flex-col overflow-hidden">
+                <div class="px-4 py-2 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-300">11-Sector Resilience Matrix</span>
+                        <span class="text-[10px] num-tabular text-slate-400">(Sorted by Net Impact Score)</span>
+                    </div>
+                    <span class="text-[10px] num-tabular text-slate-400">Click any sector to inspect micro exposure</span>
                 </div>
 
-                <!-- Companies Table -->
-                <div>
-                    <div class="flex items-center justify-between mb-2.5">
-                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daftar Emiten Utama & Rasio Fundamental (Sectors API)</h5>
-                        <span class="text-xs text-slate-400">Data Fundamental Riil</span>
-                    </div>
+                <div class="flex-1 overflow-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-900 text-slate-400 font-mono text-[10px] uppercase sticky top-0 z-10 border-b border-slate-800 select-none">
+                            <tr>
+                                <th class="px-3 py-2 font-semibold">Sector</th>
+                                <th class="px-3 py-2 font-semibold text-center w-24">Impact</th>
+                                <th class="px-3 py-2 font-semibold w-28">Status</th>
+                                <th class="px-3 py-2 font-semibold text-right w-20">Avg DER</th>
+                                <th class="px-3 py-2 font-semibold text-right w-20">Avg NPM</th>
+                                <th class="px-3 py-2 font-semibold">Transmission Rationalization</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/80 num-tabular">
+                            @foreach($sectorResults as $item)
+                                @php
+                                    $score = $item->impact_score;
+                                    $code = $item->sector->sector_code;
+                                    $isPositive = $score > 0;
+                                    $isNegative = $score < 0;
+                                    $scoreColor = $isPositive ? 'text-emerald-400 bg-emerald-950/50 border-emerald-800' : ($isNegative ? 'text-rose-400 bg-rose-950/50 border-rose-800' : 'text-slate-400 bg-slate-800 border-slate-700');
+                                    $statusBadge = $isPositive ? 'text-emerald-300 border-emerald-800/70 bg-emerald-950/30' : ($isNegative ? 'text-rose-300 border-rose-800/70 bg-rose-950/30' : 'text-slate-400 border-slate-700 bg-slate-800/30');
+                                @endphp
+                                <tr @click="selectedSectorCode = '{{ $code }}'" 
+                                    :class="selectedSectorCode === '{{ $code }}' ? 'bg-slate-800/90 border-l-2 border-emerald-400' : 'hover:bg-slate-900/70 border-l-2 border-transparent'"
+                                    class="cursor-pointer transition">
+                                    
+                                    <td class="px-3 py-2 font-sans">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-slate-100 text-[12px]">{{ $item->sector->sector_name }}</span>
+                                            <span class="text-[9px] font-mono text-slate-400">{{ $code }}</span>
+                                        </div>
+                                    </td>
 
-                    <div class="border border-slate-800 rounded-xl overflow-hidden">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-950 text-slate-400 uppercase font-mono-num text-[11px] border-b border-slate-800">
-                                <tr>
-                                    <th class="px-3.5 py-2.5 font-semibold">Ticker</th>
-                                    <th class="px-3.5 py-2.5 font-semibold">Nama Perusahaan</th>
-                                    <th class="px-3.5 py-2.5 font-semibold text-right">Market Cap</th>
-                                    <th class="px-3.5 py-2.5 font-semibold text-right">DER</th>
-                                    <th class="px-3.5 py-2.5 font-semibold text-right">NPM</th>
-                                    <th class="px-3.5 py-2.5 font-semibold text-right">P/E</th>
+                                    <td class="px-3 py-2 text-center">
+                                        <span class="inline-block px-2 py-0.5 rounded border text-[11px] font-bold font-mono {{ $scoreColor }}">
+                                            {{ $score > 0 ? '+' : '' }}{{ $score }}
+                                        </span>
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <span class="inline-block px-1.5 py-0.5 rounded border text-[10px] font-mono uppercase {{ $statusBadge }}">
+                                            {{ $item->resilience_status }}
+                                        </span>
+                                    </td>
+
+                                    <td class="px-3 py-2 text-right text-slate-300 text-[11px]">
+                                        {{ $item->sector->avg_der }}x
+                                    </td>
+
+                                    <td class="px-3 py-2 text-right text-[11px] {{ $item->sector->avg_npm < 0 ? 'text-rose-400' : 'text-emerald-400' }}">
+                                        {{ $item->sector->avg_npm }}%
+                                    </td>
+
+                                    <td class="px-3 py-2 text-slate-300 text-[11px] font-sans truncate max-w-xs xl:max-w-md">
+                                        {{ $item->reasoning }}
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-800/80">
-                                <template x-for="comp in selectedSector?.companies" :key="comp.id">
-                                    <tr class="hover:bg-slate-800/40 transition">
-                                        <td class="px-3.5 py-2.5 font-mono-num font-bold text-slate-100 flex items-center gap-1.5">
-                                            <span x-text="comp.symbol"></span>
-                                            <template x-if="selectedSector?.vulnerable_companies?.includes(comp.symbol)">
-                                                <span class="px-1.5 py-0.2 rounded text-[10px] bg-rose-950 text-rose-400 border border-rose-800">Rentan</span>
-                                            </template>
-                                            <template x-if="selectedSector?.beneficiary_companies?.includes(comp.symbol)">
-                                                <span class="px-1.5 py-0.2 rounded text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800">Tangguh</span>
-                                            </template>
-                                        </td>
-                                        <td class="px-3.5 py-2.5 text-slate-300" x-text="comp.name"></td>
-                                        <td class="px-3.5 py-2.5 font-mono-num text-right text-slate-200" x-text="(comp.market_cap / 1000000000000).toFixed(1) + ' T'"></td>
-                                        <td class="px-3.5 py-2.5 font-mono-num text-right" 
-                                            :class="comp.der > 1.5 ? 'text-rose-400 font-semibold' : 'text-slate-300'"
-                                            x-text="comp.der ? comp.der + 'x' : '-'"></td>
-                                        <td class="px-3.5 py-2.5 font-mono-num text-right" 
-                                            :class="comp.npm < 0 ? 'text-rose-400 font-semibold' : 'text-emerald-400 font-semibold'"
-                                            x-text="comp.npm ? comp.npm + '%' : '-'"></td>
-                                        <td class="px-3.5 py-2.5 font-mono-num text-right text-slate-400" x-text="comp.pe_ratio ? comp.pe_ratio + 'x' : '-'"></td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- LOWER HALF: Docked Micro Company Inspector (Density 9) -->
+            <div class="h-1/2 flex flex-col overflow-hidden bg-slate-900/20">
+                <div class="px-4 py-2 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between shrink-0">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-mono uppercase text-slate-400">Micro Exposure Inspector:</span>
+                        <span class="text-xs font-bold text-slate-100 font-sans" x-text="activeSector?.name + ' (' + activeSector?.code + ')'"></span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase border"
+                              :class="activeSector?.score > 0 ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : (activeSector?.score < 0 ? 'bg-rose-950 text-rose-400 border-rose-800' : 'bg-slate-800 text-slate-400 border-slate-700')"
+                              x-text="'Net Score: ' + (activeSector?.score > 0 ? '+' : '') + activeSector?.score"></span>
+                    </div>
+                    <div class="text-[10px] num-tabular text-slate-400 flex items-center gap-3">
+                        <span>Avg DER: <strong class="text-slate-200" x-text="activeSector?.avg_der + 'x'"></strong></span>
+                        <span>Avg NPM: <strong class="text-slate-200" x-text="activeSector?.avg_npm + '%'"></strong></span>
+                        <span>Sectors API Grounded</span>
                     </div>
                 </div>
 
-                <div class="pt-2 flex justify-end">
-                    <button @click="selectedSector = null" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition">
-                        Tutup
-                    </button>
+                <!-- Sector Specific Reasoning Callout -->
+                <div class="px-4 py-2 bg-slate-950 border-b border-slate-800/80 text-xs text-slate-300 flex items-start gap-2">
+                    <span class="text-emerald-400 font-mono text-[11px] mt-0.5">&gt;</span>
+                    <p class="leading-relaxed font-sans text-[11px]" x-text="activeSector?.reasoning"></p>
+                </div>
+
+                <!-- Companies Table in Selected Sector -->
+                <div class="flex-1 overflow-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-900/90 text-slate-400 font-mono text-[10px] uppercase sticky top-0 z-10 border-b border-slate-800 select-none">
+                            <tr>
+                                <th class="px-3 py-1.5 font-semibold w-24">Ticker</th>
+                                <th class="px-3 py-1.5 font-semibold">Emiten Name</th>
+                                <th class="px-3 py-1.5 font-semibold text-right w-32">Market Cap</th>
+                                <th class="px-3 py-1.5 font-semibold text-right w-24">DER (Utang)</th>
+                                <th class="px-3 py-1.5 font-semibold text-right w-24">NPM (Margin)</th>
+                                <th class="px-3 py-1.5 font-semibold text-right w-20">P/E</th>
+                                <th class="px-3 py-1.5 font-semibold text-right w-20">PBV</th>
+                                <th class="px-3 py-1.5 font-semibold w-28 text-center">Exposure Tag</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 num-tabular">
+                            <template x-for="comp in activeSector?.companies" :key="comp.id">
+                                <tr class="hover:bg-slate-800/50 transition">
+                                    <td class="px-3 py-1.5 font-bold text-slate-100 text-[12px]" x-text="comp.symbol"></td>
+                                    <td class="px-3 py-1.5 text-slate-300 font-sans text-[11px] truncate max-w-xs" x-text="comp.name"></td>
+                                    <td class="px-3 py-1.5 text-right text-slate-200 text-[11px]" x-text="(comp.market_cap / 1000000000000).toFixed(1) + ' T'"></td>
+                                    <td class="px-3 py-1.5 text-right text-[11px]" 
+                                        :class="comp.der > 1.5 ? 'text-rose-400 font-semibold' : 'text-slate-300'"
+                                        x-text="comp.der ? comp.der + 'x' : '-'"></td>
+                                    <td class="px-3 py-1.5 text-right text-[11px]" 
+                                        :class="comp.npm < 0 ? 'text-rose-400 font-semibold' : 'text-emerald-400 font-semibold'"
+                                        x-text="comp.npm ? comp.npm + '%' : '-'"></td>
+                                    <td class="px-3 py-1.5 text-right text-slate-400 text-[11px]" x-text="comp.pe_ratio ? comp.pe_ratio + 'x' : '-'"></td>
+                                    <td class="px-3 py-1.5 text-right text-slate-400 text-[11px]" x-text="comp.pbv_ratio ? comp.pbv_ratio + 'x' : '-'"></td>
+                                    <td class="px-3 py-1.5 text-center">
+                                        <template x-if="activeSector?.vulnerable_companies?.includes(comp.symbol)">
+                                            <span class="inline-block px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-rose-950 text-rose-300 border border-rose-800">HIGH EXPOSURE</span>
+                                        </template>
+                                        <template x-if="activeSector?.beneficiary_companies?.includes(comp.symbol)">
+                                            <span class="inline-block px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">RESILIENT</span>
+                                        </template>
+                                        <template x-if="!activeSector?.vulnerable_companies?.includes(comp.symbol) && !activeSector?.beneficiary_companies?.includes(comp.symbol)">
+                                            <span class="text-slate-400 text-[10px] font-mono">-</span>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
 
-        <!-- Institutional Regulatory Disclaimer Banner -->
-        <footer class="mt-12 pt-6 border-t border-slate-800/80 text-xs text-slate-400 space-y-2">
-            <div class="flex items-center gap-2 text-slate-400 font-semibold">
-                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>
-                <span>LEGAL & INVESTMENT RISK DISCLAIMER</span>
-            </div>
-            <p class="leading-relaxed">
-                Platform <strong>MacroSectors AI</strong> dirancang secara eksklusif sebagai instrumen simulasi analisis riset kuantitatif pasar modal. Seluruh luaran, skor dampak, dan sintesis naratif merupakan hasil inferensi model pemrosesan data berbasis Sectors REST API dan model komputasi, <strong>bukan merupakan rekomendasi investasi, anjuran beli/jual saham, maupun nasihat keuangan legal</strong> dalam yurisdiksi Republik Indonesia. Investor diwajibkan melakukan due diligence mandiri (*Do Your Own Research*) sebelum mengambil keputusan alokasi modal.
-            </p>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-900">
-                <span>© 2026 MacroSectors AI • Author: Wesley Wilnio • Sectors Hackathon Indonesia 2026</span>
-                <span>Powered by Sectors REST API & Modern Quantitative Macro Models</span>
-            </div>
-        </footer>
-
-    </main>
+        </main>
+    </div>
 
 </body>
 </html>
