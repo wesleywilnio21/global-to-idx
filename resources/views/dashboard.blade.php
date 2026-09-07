@@ -85,7 +85,7 @@
         </div>
     @endif
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
 
         <!-- 4 Stat Cards Grid (Identical to POSCafe StatCard Pattern) -->
         @php
@@ -154,7 +154,7 @@
         </div>
 
         <!-- Scenario Control Panel (POSCafe Clean Structured Card) -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                 <div>
                     <h2 class="text-xl font-bold text-slate-900">Simulasi Skenario Makroekonomi</h2>
@@ -200,7 +200,7 @@
 
         <!-- Executive Intelligence Narrative Card -->
         @if($analysisData)
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-2.5">
                         <div class="w-3 h-3 rounded-full bg-blue-600"></div>
@@ -345,7 +345,7 @@
         </div>
 
         <!-- Micro Exposure Inspector (POSCafe Clean Detail Card) -->
-        <div id="micro-inspector" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+        <div id="micro-inspector" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                 <div>
                     <div class="flex items-center gap-2">
@@ -367,7 +367,7 @@
             </div>
 
             <!-- Economic Transmission Rationalization -->
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4.5 text-sm text-slate-700 leading-relaxed flex items-start gap-3.5">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-sm text-slate-700 leading-relaxed flex items-start gap-3.5">
                 <div class="w-2 h-2 rounded-full bg-blue-600 mt-2 shrink-0"></div>
                 <div>
                     <span class="text-xs font-bold text-slate-900 uppercase tracking-wider block mb-1">Rasionalisasi Transmisi Ekonomi:</span>
@@ -378,10 +378,10 @@
             <!-- Companies List Table -->
             <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
                 <div class="overflow-x-auto custom-scrollbar">
-                    <table class="w-full text-left border-collapse min-w-[750px]">
+                    <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs font-semibold uppercase tracking-wider select-none">
-                                <th class="px-6 py-3.5 w-32">Ticker</th>
+                                <th class="px-6 py-3.5 w-28">Ticker</th>
                                 <th class="px-6 py-3.5">Nama Perusahaan</th>
                                 <th class="px-6 py-3.5 text-right w-40">Kapitalisasi Pasar</th>
                                 <th class="px-6 py-3.5 text-right w-32">DER (Utang)</th>
@@ -395,7 +395,7 @@
                             <template x-for="comp in activeSector?.companies" :key="comp.id">
                                 <tr class="hover:bg-slate-50/50 transition-colors">
                                     <td class="px-6 py-4 font-bold text-slate-900 text-sm" x-text="comp.symbol"></td>
-                                    <td class="px-6 py-4 text-slate-700 font-sans text-xs" x-text="comp.name"></td>
+                                    <td class="px-6 py-4 text-slate-800 font-medium font-sans text-sm" x-text="comp.name"></td>
                                     <td class="px-6 py-4 text-right text-slate-800 text-xs font-semibold" x-text="(comp.market_cap / 1000000000000).toFixed(1) + ' T'"></td>
                                     <td class="px-6 py-4 text-right text-xs font-semibold" 
                                         :class="comp.der > 1.5 ? 'text-rose-600' : 'text-slate-700'"
@@ -425,7 +425,7 @@
         </div>
 
         <!-- Regulatory & Risk Disclaimer -->
-        <footer class="pt-8 border-t border-slate-200 text-xs text-slate-500 space-y-2.5">
+        <footer class="mt-4 pt-8 pb-20 border-t border-slate-200 text-xs text-slate-500 flex flex-col gap-3">
             <div class="flex items-center gap-2 text-slate-700 font-semibold">
                 <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
@@ -435,7 +435,7 @@
             <p class="leading-relaxed">
                 Platform <strong>MacroSectors AI</strong> dirancang sebagai instrumen simulasi analitik kuantitatif pasar modal untuk riset. Seluruh luaran, skor dampak, dan sintesis naratif bukan merupakan anjuran transaksi efek, rekomendasi jual/beli saham, atau nasihat keuangan legal dalam yurisdiksi Republik Indonesia.
             </p>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-slate-400 pt-2">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
                 <span>© 2026 MacroSectors AI • Author: Wesley Wilnio • Sectors Hackathon Indonesia 2026</span>
                 <span>Powered by Sectors REST API & Fundamental Ratios Cache</span>
             </div>
