@@ -1,17 +1,17 @@
 <!-- Modern Sidebar Navigation (SaaS Layout) -->
-<aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 h-screen sticky top-0 overflow-y-auto z-40 custom-scrollbar">
+<aside class="w-60 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 h-screen sticky top-0 overflow-y-auto z-40 custom-scrollbar">
     <div class="flex flex-col">
         <!-- Brand Header -->
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs font-bold text-lg group-hover:scale-105 transition-transform">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs font-bold text-base group-hover:scale-105 transition-transform">
                     M
                 </div>
                 <div>
-                    <h1 class="text-base font-bold text-slate-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors">MacroSectors</h1>
+                    <h1 class="text-sm font-bold text-slate-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors">MacroSectors</h1>
                     <div class="flex items-center gap-1.5 mt-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">IDX Intel AI</span>
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">IDX Intel AI</span>
                     </div>
                 </div>
             </a>

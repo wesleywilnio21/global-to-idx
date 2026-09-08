@@ -159,7 +159,7 @@ class SectorsApiService
 
             $msg = $syncedCompanies > 0
                 ? "Berhasil menyinkronkan {$sectorCount} sektor dan {$syncedCompanies} emiten langsung dari Sectors API v2."
-                : "Sectors API: Live & Terhubung! Status 11 sektor diperbarui (Data fundamental 49 emiten aman di database lokal, hemat kredit).";
+                : 'Sectors API: Live & Terhubung! Status 11 sektor diperbarui (Data fundamental 49 emiten aman di database lokal, hemat kredit).';
 
             return [
                 'success' => true,

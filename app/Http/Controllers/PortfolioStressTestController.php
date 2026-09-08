@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\MacroAnalysisResult;
 use App\Models\MacroScenario;
+use App\Models\SectorCache;
+use App\Services\MacroReasoningService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -18,23 +20,65 @@ class PortfolioStressTestController extends Controller
         $allCompanies = Company::with('sector')->orderBy('symbol')->get();
         $presetScenarios = MacroScenario::where('is_preset', true)->get();
 
-        // Get active scenario
-        $scenarioId = $request->query('scenario_id');
-        $activeScenario = null;
+        // Handle custom scenario submission or preset selection
+        if ($request->filled('custom_scenario')) {
+            $text = trim((string) $request->custom_scenario);
+            $title = mb_substr($text, 0, 100).(mb_strlen($text) > 100 ? '...' : '');
 
-        if ($scenarioId && $scenarioId !== 'baseline' && $scenarioId !== '0') {
-            $activeScenario = MacroScenario::find($scenarioId);
+            $activeScenario = MacroScenario::create([
+                'title' => $title,
+                'description' => $text,
+                'category' => 'geopolitical',
+                'is_preset' => false,
+            ]);
+        } else {
+            $scenarioId = $request->input('scenario_id');
+            $activeScenario = null;
+
+            if ($scenarioId && $scenarioId !== 'baseline' && $scenarioId !== '0') {
+                $activeScenario = MacroScenario::find($scenarioId);
+            }
+
+            if (! $activeScenario) {
+                $activeScenario = $presetScenarios->first();
+            }
         }
 
-        if (! $activeScenario) {
-            $activeScenario = $presetScenarios->first();
-        }
-
-        // Fetch sector results for this scenario
+        // Fetch sector results for this scenario, or generate dynamically if not present
         $sectorResults = MacroAnalysisResult::with('sector')
             ->where('scenario_id', $activeScenario?->id)
             ->get()
             ->keyBy(fn ($r) => $r->sector->sector_code);
+
+        if ($sectorResults->isEmpty() && $activeScenario) {
+            $reasoningService = app(MacroReasoningService::class);
+            $generated = $reasoningService->analyzeScenario($activeScenario->title, $activeScenario->description);
+            $sectorsMap = SectorCache::all()->keyBy('sector_code');
+
+            foreach ($generated['sectors'] as $sectorCode => $data) {
+                if (isset($sectorsMap[$sectorCode])) {
+                    MacroAnalysisResult::updateOrCreate(
+                        [
+                            'scenario_id' => $activeScenario->id,
+                            'sector_id' => $sectorsMap[$sectorCode]->id,
+                        ],
+                        [
+                            'impact_score' => $data['impact_score'],
+                            'resilience_status' => $data['resilience_status'],
+                            'reasoning' => $data['reasoning'],
+                            'score_breakdown' => $data['score_breakdown'] ?? null,
+                            'vulnerable_companies' => $data['vulnerable_companies'] ?? [],
+                            'beneficiary_companies' => $data['beneficiary_companies'] ?? [],
+                        ]
+                    );
+                }
+            }
+
+            $sectorResults = MacroAnalysisResult::with('sector')
+                ->where('scenario_id', $activeScenario->id)
+                ->get()
+                ->keyBy(fn ($r) => $r->sector->sector_code);
+        }
 
         // Pre-defined portfolio templates for instant demo
         $presetPortfolios = [
