@@ -85,7 +85,7 @@
         </div>
     @endif
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 pb-16 flex flex-col gap-8 sm:gap-10">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 pb-6 sm:pb-8 flex flex-col gap-8 sm:gap-10">
 
         <!-- 4 Stat Cards Grid (Unified 4-column on desktop & split-screen) -->
         @php
@@ -426,8 +426,8 @@
 
     </main>
 
-    <!-- Regulatory & Risk Disclaimer Footer (Dedicated Spacious Section) -->
-    <footer class="border-t border-slate-200 bg-white/60 backdrop-blur-xs py-14 mt-12 mb-16">
+    <!-- Regulatory & Risk Disclaimer Footer -->
+    <footer class="border-t border-slate-200 bg-white/80 backdrop-blur-xs py-8 sm:py-10 mt-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 text-xs text-slate-500">
             <div class="flex items-center gap-2 text-slate-700 font-bold text-sm tracking-wide">
                 <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
