@@ -29,18 +29,19 @@ class MacroAnalysisController extends Controller
 
         // Determine current active scenario
         $scenarioId = $request->query('scenario_id');
+        $isCleared = $request->has('clear') || $scenarioId === 'baseline' || $scenarioId === '0';
         $activeScenario = null;
 
-        if ($scenarioId) {
+        if ($scenarioId && ! $isCleared) {
             $activeScenario = MacroScenario::find($scenarioId);
         }
 
-        if (! $activeScenario) {
+        if (! $activeScenario && ! $isCleared) {
             $activeScenario = $presetScenarios->first();
         }
 
         $analysisData = null;
-        $sectorResults = [];
+        $sectorResults = collect();
 
         if ($activeScenario) {
             // Check if analysis results already exist in database
@@ -93,6 +94,28 @@ class MacroAnalysisController extends Controller
                 ->where('scenario_id', $activeScenario->id)
                 ->get()
                 ->sortByDesc('impact_score');
+        } else {
+            // Neutral / Baseline State (No active macroeconomic shock applied)
+            $analysisData = [
+                'executive_summary' => 'Pasar modal Indonesia dalam kondisi operasional netral (baseline). Seluruh 11 sektor IDX beroperasi normal sesuai fundamental dasar masing-masing tanpa adanya transmisi disrupsi ekonomi makro spesifik.',
+                'key_takeaway' => 'Pilih salah satu skenario preset di atas atau ketik berita/skenario kustom Anda untuk mulai mensimulasikan transmisi dampak ekonomi makro ke sektor dan emiten IHSG.',
+                'engine_used' => 'Kondisi Netral Pasar (Baseline IHSG)',
+            ];
+
+            $allSectors = SectorCache::with('companies')->get();
+            $sectorResults = $allSectors->map(function ($sector) {
+                return (object) [
+                    'id' => 0,
+                    'scenario_id' => null,
+                    'sector_id' => $sector->id,
+                    'sector' => $sector,
+                    'impact_score' => 0,
+                    'resilience_status' => 'Neutral',
+                    'reasoning' => 'Kondisi netral. Belum ada skenario transmisi makro yang diaplikasikan ke sektor ini.',
+                    'vulnerable_companies' => [],
+                    'beneficiary_companies' => [],
+                ];
+            });
         }
 
         $sectorsPayload = [];

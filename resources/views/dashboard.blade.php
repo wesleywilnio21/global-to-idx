@@ -141,9 +141,11 @@
                 <div>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Driver Makro</p>
                     <p class="text-xl sm:text-2xl font-bold text-slate-900 truncate max-w-[130px] capitalize">
-                        {{ str_replace('_', ' ', $activeScenario?->category ?? 'Makro Global') }}
+                        {{ $activeScenario ? str_replace('_', ' ', $activeScenario->category) : 'Netral' }}
                     </p>
-                    <p class="text-[11px] text-slate-400 mt-1 font-medium truncate">Kategori Transmisi Aktif</p>
+                    <p class="text-[11px] text-slate-400 mt-1 font-medium truncate">
+                        {{ $activeScenario ? 'Kategori Transmisi Aktif' : 'Tanpa Guncangan Makro' }}
+                    </p>
                 </div>
                 <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-200 text-amber-600">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,15 +162,46 @@
                     <h2 class="text-xl font-bold text-slate-900">Simulasi Skenario Makroekonomi</h2>
                     <p class="text-xs text-slate-500 mt-1">Pilih preset skenario ekonomi global atau ketik berita kustom untuk mensimulasikan transmisi dampaknya ke bursa Indonesia.</p>
                 </div>
-                <div class="self-start sm:self-auto px-3.5 py-1.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full border border-slate-200">
-                    Aktif: {{ $activeScenario?->title }}
+                <div class="flex items-center gap-2">
+                    <div class="px-3.5 py-1.5 {{ $activeScenario ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-700 border-slate-200' }} text-xs font-semibold rounded-full border">
+                        Aktif: {{ $activeScenario ? $activeScenario->title : 'Kondisi Netral (Baseline)' }}
+                    </div>
+                    @if($activeScenario)
+                        <a href="{{ route('dashboard', ['clear' => 1]) }}" 
+                           title="Reset ke Kondisi Netral"
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-full transition-all">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span>Clear Skenario</span>
+                        </a>
+                    @endif
                 </div>
             </div>
 
             <!-- Presets Grid -->
             <div>
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Pilihan Skenario Cepat (Preset):</p>
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pilihan Skenario Cepat (Preset):</p>
+                    @if($activeScenario)
+                        <a href="{{ route('dashboard', ['clear' => 1]) }}" class="text-xs font-medium text-slate-500 hover:text-rose-600 transition-colors inline-flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            <span>Reset Skenario</span>
+                        </a>
+                    @endif
+                </div>
                 <div class="flex flex-wrap gap-2.5">
+                    <!-- Neutral / Baseline Option Button -->
+                    <a href="{{ route('dashboard', ['clear' => 1]) }}"
+                       class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all border {{ ! $activeScenario ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200' }}">
+                        <svg class="w-3.5 h-3.5 {{ ! $activeScenario ? 'text-slate-300' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Kondisi Netral (Default)</span>
+                    </a>
+
                     @foreach($presetScenarios as $preset)
                         @php
                             $isActive = $activeScenario && $activeScenario->id === $preset->id;
