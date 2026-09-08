@@ -70,36 +70,40 @@ class MacroReasoningService
      */
     protected function callGemini(string $title, ?string $desc, $sectors): ?array
     {
+        $modelsToTry = array_unique([$this->geminiModel, 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-flash-latest']);
+
         try {
             $prompt = $this->buildSystemPrompt($title, $desc, $sectors);
 
-            $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$this->geminiModel}:generateContent?key={$this->geminiApiKey}";
+            foreach ($modelsToTry as $model) {
+                $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$this->geminiApiKey}";
 
-            $response = Http::timeout(30)->post($endpoint, [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt],
+                $response = Http::withoutVerifying()->timeout(30)->post($endpoint, [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt],
+                            ],
                         ],
                     ],
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.2,
-                    'responseMimeType' => 'application/json',
-                ],
-            ]);
+                    'generationConfig' => [
+                        'temperature' => 0.2,
+                        'responseMimeType' => 'application/json',
+                    ],
+                ]);
 
-            if ($response->successful()) {
-                $content = $response->json('candidates.0.content.parts.0.text');
-                $parsed = json_decode((string) $content, true);
+                if ($response->successful()) {
+                    $content = $response->json('candidates.0.content.parts.0.text');
+                    $parsed = json_decode((string) $content, true);
 
-                if (is_array($parsed) && isset($parsed['sectors'])) {
-                    $parsed['engine_used'] = "Google Gemini ({$this->geminiModel})";
+                    if (is_array($parsed) && isset($parsed['sectors'])) {
+                        $parsed['engine_used'] = "Google Gemini ({$model})";
 
-                    return $parsed;
+                        return $parsed;
+                    }
+                } else {
+                    Log::warning("Gemini API ({$model}) returned status {$response->status()}: ".substr($response->body(), 0, 150));
                 }
-            } else {
-                Log::warning('Gemini API returned error: '.$response->body());
             }
         } catch (\Throwable $e) {
             Log::error('Gemini API call failed: '.$e->getMessage());

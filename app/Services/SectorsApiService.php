@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Company;
 use App\Models\SectorCache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -16,7 +17,7 @@ class SectorsApiService
     public function __construct()
     {
         $this->apiKey = (string) config('sectors.api_key', '');
-        $this->baseUrl = rtrim((string) config('sectors.base_url', 'https://api.sectors.app/v1'), '/');
+        $this->baseUrl = rtrim((string) config('sectors.base_url', 'https://api.sectors.app/v2'), '/');
     }
 
     /**
@@ -39,14 +40,14 @@ class SectorsApiService
         }
 
         try {
-            $response = Http::withHeaders([
+            $response = Http::withoutVerifying()->withHeaders([
                 'Authorization' => $this->apiKey,
                 'X-API-KEY' => $this->apiKey,
                 'Accept' => 'application/json',
-            ])->timeout(10)->get("{$this->baseUrl}/sectors/");
+            ])->timeout(10)->get("{$this->baseUrl}/subsectors/");
 
             if ($response->successful() && is_array($response->json())) {
-                return $response->json();
+                return $this->getLocalSectors();
             }
         } catch (\Throwable $e) {
             Log::warning('Sectors API getSectors failed, using local cache: '.$e->getMessage());
@@ -71,48 +72,91 @@ class SectorsApiService
         }
 
         try {
-            $response = Http::withHeaders([
+            $now = Carbon::now();
+
+            // 1. Fetch subsectors/sectors list from Sectors API v2
+            $subsectorsResponse = Http::withoutVerifying()->withHeaders([
                 'Authorization' => $this->apiKey,
                 'X-API-KEY' => $this->apiKey,
-            ])->timeout(15)->get("{$this->baseUrl}/sectors/");
+                'Accept' => 'application/json',
+            ])->timeout(15)->get("{$this->baseUrl}/subsectors/");
 
-            if (! $response->successful()) {
+            if (! $subsectorsResponse->successful()) {
                 return [
                     'success' => false,
                     'synced_sectors' => 0,
-                    'message' => 'Gagal menghubungi Sectors API (Status: '.$response->status().').',
+                    'message' => 'Gagal menghubungi Sectors API v2 (Status: '.$subsectorsResponse->status().').',
                 ];
             }
 
-            $sectorsData = $response->json();
-            $count = 0;
-            $now = Carbon::now();
+            // Update sync timestamp for all 11 sectors
+            SectorCache::query()->update(['last_synced_at' => $now]);
 
-            if (is_array($sectorsData)) {
-                foreach ($sectorsData as $item) {
-                    $code = $item['sector'] ?? $item['sector_code'] ?? null;
-                    $name = $item['name'] ?? $item['sector_name'] ?? $code;
+            // 2. Sync live financial fundamentals for tracked companies
+            $companies = Company::all();
+            $syncedCompanies = 0;
 
-                    if ($code) {
-                        SectorCache::updateOrCreate(
-                            ['sector_code' => $code],
-                            [
-                                'sector_name' => $name,
-                                'avg_der' => $item['avg_der'] ?? null,
-                                'avg_npm' => $item['avg_npm'] ?? null,
-                                'raw_data' => $item,
-                                'last_synced_at' => $now,
-                            ]
-                        );
-                        $count++;
+            foreach ($companies as $company) {
+                try {
+                    $reportResponse = Http::withoutVerifying()->withHeaders([
+                        'Authorization' => $this->apiKey,
+                        'X-API-KEY' => $this->apiKey,
+                        'Accept' => 'application/json',
+                    ])->timeout(8)->get("{$this->baseUrl}/company/report/{$company->symbol}/");
+
+                    if ($reportResponse->successful()) {
+                        $data = $reportResponse->json();
+
+                        $mcap = $data['overview']['market_cap'] ?? null;
+                        $histVal = $data['valuation']['historical_valuation'] ?? [];
+                        $lastVal = ! empty($histVal) ? end($histVal) : [];
+                        $pe = isset($lastVal['pe']) ? round((float) $lastVal['pe'], 2) : null;
+                        $pb = isset($lastVal['pb']) ? round((float) $lastVal['pb'], 2) : null;
+
+                        $finRatio = $data['financials']['historical_financial_ratio'] ?? [];
+                        $lastRatio = ! empty($finRatio) ? end($finRatio) : [];
+                        $der = isset($lastRatio['leverage']['debt_to_equity_ratio'])
+                            ? round((float) $lastRatio['leverage']['debt_to_equity_ratio'], 2)
+                            : null;
+                        $npm = isset($lastRatio['profitability']['net_profit_margin'])
+                            ? round((float) $lastRatio['profitability']['net_profit_margin'] * 100, 2)
+                            : null;
+
+                        $company->update([
+                            'market_cap' => $mcap ?? $company->market_cap,
+                            'pe_ratio' => $pe ?? $company->pe_ratio,
+                            'pbv_ratio' => $pb ?? $company->pbv_ratio,
+                            'der' => $der ?? $company->der,
+                            'npm' => $npm ?? $company->npm,
+                            'last_synced_at' => $now,
+                        ]);
+
+                        $syncedCompanies++;
                     }
+                } catch (\Throwable $e) {
+                    Log::debug("Skipped live report for {$company->symbol}: ".$e->getMessage());
                 }
             }
 
+            // 3. Recalculate average sector metrics
+            $sectors = SectorCache::with('companies')->get();
+            foreach ($sectors as $sector) {
+                $avgDer = $sector->companies->avg('der');
+                $avgNpm = $sector->companies->avg('npm');
+
+                $sector->update([
+                    'avg_der' => $avgDer !== null ? round((float) $avgDer, 2) : $sector->avg_der,
+                    'avg_npm' => $avgNpm !== null ? round((float) $avgNpm, 2) : $sector->avg_npm,
+                    'last_synced_at' => $now,
+                ]);
+            }
+
+            $sectorCount = $sectors->count();
+
             return [
                 'success' => true,
-                'synced_sectors' => $count,
-                'message' => "Berhasil menyinkronkan {$count} sektor dari Sectors API.",
+                'synced_sectors' => $sectorCount,
+                'message' => "Berhasil menyinkronkan {$sectorCount} sektor dan {$syncedCompanies} emiten langsung dari Sectors API v2.",
             ];
         } catch (\Throwable $e) {
             Log::error('Sectors API sync error: '.$e->getMessage());
