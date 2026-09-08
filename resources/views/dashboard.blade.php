@@ -33,7 +33,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white"
+<body class="bg-slate-50 text-slate-800 min-h-screen antialiased selection:bg-blue-600 selection:text-white"
       x-data="macroDashboard()">
 
     <!-- Top Navigation Header (Exact POSCafe Standard) -->
@@ -85,7 +85,7 @@
         </div>
     @endif
 
-    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 pb-8 flex flex-col gap-8 sm:gap-10">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 pb-12 flex flex-col gap-8 sm:gap-10">
 
         <!-- 4 Stat Cards Grid (Unified 4-column on desktop & split-screen) -->
         @php
@@ -424,26 +424,24 @@
             </div>
         </div>
 
-    </main>
-
-    <!-- Regulatory & Risk Disclaimer Footer -->
-    <footer class="w-full border-t border-slate-200 bg-white py-8 sm:py-10 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 text-xs text-slate-500">
+        <!-- Regulatory & Risk Disclaimer Footer -->
+        <footer class="pt-6 border-t border-slate-200 text-xs text-slate-500 flex flex-col gap-3">
             <div class="flex items-center gap-2 text-slate-700 font-bold text-xs tracking-wide">
                 <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                 </svg>
                 <span>LEGAL & INVESTMENT RISK DISCLAIMER</span>
             </div>
-            <p class="leading-relaxed text-slate-600 max-w-4xl text-xs">
+            <p class="leading-relaxed text-slate-500 text-xs max-w-4xl">
                 Platform <strong>MacroSectors AI</strong> dirancang sebagai instrumen simulasi analitik kuantitatif pasar modal untuk riset. Seluruh luaran, skor dampak, dan sintesis naratif bukan merupakan anjuran transaksi efek, rekomendasi jual/beli saham, atau nasihat keuangan legal dalam yurisdiksi Republik Indonesia.
             </p>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-slate-400 pt-4 border-t border-slate-100 gap-2">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-200/60 gap-2">
                 <span>© 2026 MacroSectors AI • Author: Wesley Wilnio • Sectors Hackathon Indonesia 2026</span>
                 <span>Powered by Sectors REST API & Fundamental Ratios Cache</span>
             </div>
-        </div>
-    </footer>
+        </footer>
+
+    </main>
 
     <!-- Alpine.js Logic -->
     <script>
