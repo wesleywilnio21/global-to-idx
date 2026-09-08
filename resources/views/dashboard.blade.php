@@ -482,21 +482,21 @@
                     </div>
 
                     <!-- Formula Sum Bar -->
-                    <div class="mt-4 pt-3.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
-                        <div class="flex items-center gap-1.5 flex-wrap font-mono">
-                            <span class="font-sans text-slate-600 font-semibold">Formula Total:</span>
+                    <div class="mt-6 pt-4 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500">
+                        <div class="flex items-center gap-2 flex-wrap font-mono bg-slate-50 border border-slate-200/60 px-3.5 py-2 rounded-xl">
+                            <span class="font-sans text-slate-700 font-bold">Formula Total:</span>
                             <span class="font-semibold text-slate-700" x-text="'(' + ((activeSector?.score_breakdown?.revenue_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.revenue_impact ?? 0) + ' Pendapatan)'"></span>
-                            <span>+</span>
+                            <span class="text-slate-400 font-bold">+</span>
                             <span class="font-semibold text-slate-700" x-text="'(' + ((activeSector?.score_breakdown?.cost_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.cost_impact ?? 0) + ' Biaya)'"></span>
-                            <span>+</span>
+                            <span class="text-slate-400 font-bold">+</span>
                             <span class="font-semibold text-slate-700" x-text="'(' + ((activeSector?.score_breakdown?.balance_sheet_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.balance_sheet_impact ?? 0) + ' Neraca)'"></span>
-                            <span>=</span>
-                            <span class="px-2 py-0.5 rounded font-bold"
-                                  :class="activeSector?.score > 0 ? 'bg-emerald-50 text-emerald-700' : (activeSector?.score < 0 ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-700')"
+                            <span class="text-slate-400 font-bold">=</span>
+                            <span class="px-2.5 py-0.5 rounded-lg font-bold shadow-2xs"
+                                  :class="activeSector?.score > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : (activeSector?.score < 0 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200')"
                                   x-text="'Skor Total ' + (activeSector?.score > 0 ? '+' : '') + (activeSector?.score ?? 0)">
                             </span>
                         </div>
-                        <span class="text-[11px] text-slate-400">Skala -10 (Kritis) s.d +10 (Sangat Diuntungkan)</span>
+                        <span class="text-[11px] text-slate-400 font-medium self-end sm:self-auto">Skala -10 (Kritis) s.d +10 (Sangat Diuntungkan)</span>
                     </div>
                 </div>
             </div>
