@@ -1,6 +1,6 @@
 <!-- Modern Sidebar Navigation (SaaS Layout) -->
-<aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 min-h-screen">
-    <div>
+<aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 h-screen sticky top-0 overflow-y-auto z-40 custom-scrollbar">
+    <div class="flex flex-col">
         <!-- Brand Header -->
         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
