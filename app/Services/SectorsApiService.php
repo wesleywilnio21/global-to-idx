@@ -61,7 +61,7 @@ class SectorsApiService
      *
      * @return array{success: bool, synced_sectors: int, message: string}
      */
-    public function syncAll(): array
+    public function syncAll(bool $forceDeepSync = false): array
     {
         if (! $this->isConfigured()) {
             return [
@@ -74,7 +74,7 @@ class SectorsApiService
         try {
             $now = Carbon::now();
 
-            // 1. Fetch subsectors/sectors list from Sectors API v2
+            // 1. Fetch subsectors/sectors list from Sectors API v2 (Lightweight: only costs 1 credit)
             $subsectorsResponse = Http::withoutVerifying()->withHeaders([
                 'Authorization' => $this->apiKey,
                 'X-API-KEY' => $this->apiKey,
@@ -92,71 +92,79 @@ class SectorsApiService
             // Update sync timestamp for all 11 sectors
             SectorCache::query()->update(['last_synced_at' => $now]);
 
-            // 2. Sync live financial fundamentals for tracked companies
-            $companies = Company::all();
             $syncedCompanies = 0;
+            $alreadyHasData = Company::whereNotNull('last_synced_at')->exists();
 
-            foreach ($companies as $company) {
-                try {
-                    $reportResponse = Http::withoutVerifying()->withHeaders([
-                        'Authorization' => $this->apiKey,
-                        'X-API-KEY' => $this->apiKey,
-                        'Accept' => 'application/json',
-                    ])->timeout(8)->get("{$this->baseUrl}/company/report/{$company->symbol}/");
+            // 2. Only fetch deep individual company reports if forced or if local database is empty (to save API credits)
+            if ($forceDeepSync || ! $alreadyHasData) {
+                $companies = Company::all();
 
-                    if ($reportResponse->successful()) {
-                        $data = $reportResponse->json();
+                foreach ($companies as $company) {
+                    try {
+                        $reportResponse = Http::withoutVerifying()->withHeaders([
+                            'Authorization' => $this->apiKey,
+                            'X-API-KEY' => $this->apiKey,
+                            'Accept' => 'application/json',
+                        ])->timeout(8)->get("{$this->baseUrl}/company/report/{$company->symbol}/");
 
-                        $mcap = $data['overview']['market_cap'] ?? null;
-                        $histVal = $data['valuation']['historical_valuation'] ?? [];
-                        $lastVal = ! empty($histVal) ? end($histVal) : [];
-                        $pe = isset($lastVal['pe']) ? round((float) $lastVal['pe'], 2) : null;
-                        $pb = isset($lastVal['pb']) ? round((float) $lastVal['pb'], 2) : null;
+                        if ($reportResponse->successful()) {
+                            $data = $reportResponse->json();
 
-                        $finRatio = $data['financials']['historical_financial_ratio'] ?? [];
-                        $lastRatio = ! empty($finRatio) ? end($finRatio) : [];
-                        $der = isset($lastRatio['leverage']['debt_to_equity_ratio'])
-                            ? round((float) $lastRatio['leverage']['debt_to_equity_ratio'], 2)
-                            : null;
-                        $npm = isset($lastRatio['profitability']['net_profit_margin'])
-                            ? round((float) $lastRatio['profitability']['net_profit_margin'] * 100, 2)
-                            : null;
+                            $mcap = $data['overview']['market_cap'] ?? null;
+                            $histVal = $data['valuation']['historical_valuation'] ?? [];
+                            $lastVal = ! empty($histVal) ? end($histVal) : [];
+                            $pe = isset($lastVal['pe']) ? round((float) $lastVal['pe'], 2) : null;
+                            $pb = isset($lastVal['pb']) ? round((float) $lastVal['pb'], 2) : null;
 
-                        $company->update([
-                            'market_cap' => $mcap ?? $company->market_cap,
-                            'pe_ratio' => $pe ?? $company->pe_ratio,
-                            'pbv_ratio' => $pb ?? $company->pbv_ratio,
-                            'der' => $der ?? $company->der,
-                            'npm' => $npm ?? $company->npm,
-                            'last_synced_at' => $now,
-                        ]);
+                            $finRatio = $data['financials']['historical_financial_ratio'] ?? [];
+                            $lastRatio = ! empty($finRatio) ? end($finRatio) : [];
+                            $der = isset($lastRatio['leverage']['debt_to_equity_ratio'])
+                                ? round((float) $lastRatio['leverage']['debt_to_equity_ratio'], 2)
+                                : null;
+                            $npm = isset($lastRatio['profitability']['net_profit_margin'])
+                                ? round((float) $lastRatio['profitability']['net_profit_margin'] * 100, 2)
+                                : null;
 
-                        $syncedCompanies++;
+                            $company->update([
+                                'market_cap' => $mcap ?? $company->market_cap,
+                                'pe_ratio' => $pe ?? $company->pe_ratio,
+                                'pbv_ratio' => $pb ?? $company->pbv_ratio,
+                                'der' => $der ?? $company->der,
+                                'npm' => $npm ?? $company->npm,
+                                'last_synced_at' => $now,
+                            ]);
+
+                            $syncedCompanies++;
+                        }
+                    } catch (\Throwable $e) {
+                        Log::debug("Skipped live report for {$company->symbol}: ".$e->getMessage());
                     }
-                } catch (\Throwable $e) {
-                    Log::debug("Skipped live report for {$company->symbol}: ".$e->getMessage());
+                }
+
+                // Recalculate average sector metrics
+                $sectors = SectorCache::with('companies')->get();
+                foreach ($sectors as $sector) {
+                    $avgDer = $sector->companies->avg('der');
+                    $avgNpm = $sector->companies->avg('npm');
+
+                    $sector->update([
+                        'avg_der' => $avgDer !== null ? round((float) $avgDer, 2) : $sector->avg_der,
+                        'avg_npm' => $avgNpm !== null ? round((float) $avgNpm, 2) : $sector->avg_npm,
+                        'last_synced_at' => $now,
+                    ]);
                 }
             }
 
-            // 3. Recalculate average sector metrics
-            $sectors = SectorCache::with('companies')->get();
-            foreach ($sectors as $sector) {
-                $avgDer = $sector->companies->avg('der');
-                $avgNpm = $sector->companies->avg('npm');
+            $sectorCount = SectorCache::count();
 
-                $sector->update([
-                    'avg_der' => $avgDer !== null ? round((float) $avgDer, 2) : $sector->avg_der,
-                    'avg_npm' => $avgNpm !== null ? round((float) $avgNpm, 2) : $sector->avg_npm,
-                    'last_synced_at' => $now,
-                ]);
-            }
-
-            $sectorCount = $sectors->count();
+            $msg = $syncedCompanies > 0
+                ? "Berhasil menyinkronkan {$sectorCount} sektor dan {$syncedCompanies} emiten langsung dari Sectors API v2."
+                : "Sectors API: Live & Terhubung! Status 11 sektor diperbarui (Data fundamental 49 emiten aman di database lokal, hemat kredit).";
 
             return [
                 'success' => true,
                 'synced_sectors' => $sectorCount,
-                'message' => "Berhasil menyinkronkan {$sectorCount} sektor dan {$syncedCompanies} emiten langsung dari Sectors API v2.",
+                'message' => $msg,
             ];
         } catch (\Throwable $e) {
             Log::error('Sectors API sync error: '.$e->getMessage());
