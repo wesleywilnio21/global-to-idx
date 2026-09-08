@@ -34,7 +34,7 @@
 
     <!-- Mobile Drawer -->
     <div x-show="mobileMenuOpen" x-cloak class="sm:hidden fixed inset-0 z-50 bg-slate-900/60 no-print" @click="mobileMenuOpen = false">
-        <div class="w-60 h-full bg-white shadow-xl" @click.stop>
+        <div class="w-52 h-full bg-white shadow-xl" @click.stop>
             @include('layouts.sidebar')
         </div>
     </div>
@@ -431,96 +431,115 @@
                 </div>
             </div>
 
-            <!-- 5. TWO-COLUMN SPLIT (BAGI DUA SPACE): DIAGNOSTIK EKSTREM & REKOMENDASI REBALANCING -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-
-                <!-- Left Column (50%): Diagnostik Saham Ekstrem -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-sm flex flex-col gap-5 h-full">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                        <div>
-                            <span class="text-xs font-bold text-amber-600 uppercase tracking-wider block mb-0.5">Analisis Ekstremitas</span>
-                            <h3 class="text-base font-bold text-slate-900">Diagnostik Saham Ekstrem</h3>
-                        </div>
-                        <span class="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold rounded-lg">
-                            Outliers
-                        </span>
+            <!-- 5. DIAGNOSTIK SAHAM EKSTREM (Full Width Card with 2-Column Split: Kiri & Kanan) -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-sm flex flex-col gap-5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                        <span class="text-xs font-bold text-amber-600 uppercase tracking-wider block mb-0.5">Analisis Ekstremitas</span>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900">Diagnostik Saham Ekstrem</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Identifikasi saham dengan ketahanan tertinggi dan emiten yang menjadi beban risiko utama.</p>
                     </div>
+                    <span class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold rounded-xl shrink-0">
+                        Outliers Check
+                    </span>
+                </div>
 
-                    <!-- Top Protector Card -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Top Protector Card (Kiri) -->
                     @if($topProtector)
-                        <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-start gap-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-bold text-lg shadow-2xs">
+                        <div class="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200 flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-bold text-xl shadow-2xs">
                                 🛡️
                             </div>
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0">
                                 <span class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">Penyelamat Portofolio (Top Protector)</span>
-                                <span class="font-bold text-slate-900 text-sm block mt-0.5">
+                                <h4 class="font-bold text-slate-900 text-base mt-0.5 truncate">
                                     {{ $topProtector['company']->symbol }} — {{ $topProtector['company']->name }}
-                                </span>
-                                <p class="text-xs text-emerald-800/90 mt-1.5 leading-relaxed">
-                                    Memberikan bantalan positif sebesar <strong class="font-bold text-emerald-900">+{{ $topProtector['weighted_contribution'] }} poin</strong> pada portofolio berkat daya tahan sektor {{ $topProtector['sector_name'] }} dan rasio fundamental yang solid.
-                                </p>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Top Risk Drag Card -->
-                    @if($topRiskDrag)
-                        <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200 flex items-start gap-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-lg shadow-2xs">
-                                ⚠️
-                            </div>
-                            <div class="flex-1">
-                                <span class="text-[11px] font-bold text-rose-800 uppercase tracking-wider block">Beban Terberat (Top Risk Drag)</span>
-                                <span class="font-bold text-slate-900 text-sm block mt-0.5">
-                                    {{ $topRiskDrag['company']->symbol }} — {{ $topRiskDrag['company']->name }}
-                                </span>
-                                <p class="text-xs text-rose-800/90 mt-1.5 leading-relaxed">
-                                    Menggerus skor portofolio sebesar <strong class="font-bold text-rose-900">{{ $topRiskDrag['weighted_contribution'] }} poin</strong> akibat rasio utang DER {{ $topRiskDrag['der'] }}x yang rentan terhadap beban bunga krisis.
+                                </h4>
+                                <div class="flex items-center gap-2 mt-1.5 text-xs text-slate-600">
+                                    <span class="font-semibold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-md">
+                                        Kontribusi: +{{ $topProtector['weighted_contribution'] }} Poin
+                                    </span>
+                                    <span>•</span>
+                                    <span>Bobot {{ $topProtector['weight'] }}%</span>
+                                </div>
+                                <p class="text-xs text-slate-600 mt-2.5 leading-relaxed">
+                                    Memberikan bantalan positif sebesar <strong class="text-emerald-800 font-bold">+{{ $topProtector['weighted_contribution'] }} poin</strong> pada portofolio berkat resiliensi sektor <strong>{{ $topProtector['sector_name'] }}</strong> dan fundamental neraca yang sehat.
                                 </p>
                             </div>
                         </div>
                     @else
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
-                            Tidak ada saham yang tertekan secara kritis dalam konfigurasi portofolio ini.
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-center">
+                            Tidak ada saham dengan skor positif signifikan dalam konfigurasi ini.
+                        </div>
+                    @endif
+
+                    <!-- Top Risk Drag Card (Kanan) -->
+                    @if($topRiskDrag)
+                        <div class="p-5 rounded-2xl bg-rose-50/50 border border-rose-200 flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-xl shadow-2xs">
+                                ⚠️
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[11px] font-bold text-rose-800 uppercase tracking-wider block">Beban Terberat (Top Risk Drag)</span>
+                                <h4 class="font-bold text-slate-900 text-base mt-0.5 truncate">
+                                    {{ $topRiskDrag['company']->symbol }} — {{ $topRiskDrag['company']->name }}
+                                </h4>
+                                <div class="flex items-center gap-2 mt-1.5 text-xs text-slate-600">
+                                    <span class="font-semibold text-rose-700 bg-rose-100/70 px-2 py-0.5 rounded-md">
+                                        Kontribusi: {{ $topRiskDrag['weighted_contribution'] }} Poin
+                                    </span>
+                                    <span>•</span>
+                                    <span>Bobot {{ $topRiskDrag['weight'] }}%</span>
+                                </div>
+                                <p class="text-xs text-slate-600 mt-2.5 leading-relaxed">
+                                    Menggerus skor portofolio sebesar <strong class="text-rose-800 font-bold">{{ $topRiskDrag['weighted_contribution'] }} poin</strong> akibat rasio utang leverage DER <strong>{{ $topRiskDrag['der'] }}x</strong> yang rentan terhadap guncangan krisis makro.
+                                </p>
+                            </div>
+                        </div>
+                    @else
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-center">
+                            Tidak ada saham yang tertekan secara kritis dalam portofolio ini.
                         </div>
                     @endif
                 </div>
+            </div>
 
-                <!-- Right Column (50%): Rekomendasi Rebalancing AI -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-sm flex flex-col gap-5 h-full">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                        <div class="flex items-center gap-2">
-                            <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
-                            <div>
-                                <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-0.5">Kecerdasan Buatan</span>
-                                <h3 class="text-base font-bold text-slate-900">Rekomendasi Rebalancing AI</h3>
-                            </div>
+            <!-- 6. REKOMENDASI REBALANCING AI (Full Width Card with 2-Column Split: Kiri & Kanan) -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-sm flex flex-col gap-5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-blue-600"></div>
+                        <div>
+                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-0.5">Kecerdasan Buatan</span>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900">Rekomendasi Rebalancing AI</h3>
                         </div>
-                        <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold rounded-lg">
-                            Action Plan
-                        </span>
                     </div>
-
-                    <div class="flex flex-col gap-3.5">
-                        @foreach($recommendations as $rec)
-                            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/40 flex flex-col gap-2.5 hover:border-slate-300 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $rec['type'] === 'reduce' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200' }}">
-                                        {{ $rec['type'] === 'reduce' ? 'KURANGI BOBOT' : 'TAMBAH HEDGING' }}
-                                    </span>
-                                    <h4 class="text-xs font-bold text-slate-900">{{ $rec['title'] }}</h4>
-                                </div>
-                                <p class="text-xs text-slate-600 leading-relaxed">{{ $rec['reason'] }}</p>
-                                <div class="p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-blue-700 flex items-center gap-2 shadow-2xs">
-                                    <span class="text-sm">👉</span>
-                                    <span>{{ $rec['action'] }}</span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+                    <span class="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold rounded-xl shrink-0">
+                        Action Plan Taktis
+                    </span>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    @foreach($recommendations as $rec)
+                        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/40 hover:bg-white hover:border-slate-300 transition-all flex flex-col justify-between gap-4 shadow-2xs">
+                            <div class="flex flex-col gap-2.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider {{ $rec['type'] === 'reduce' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200' }}">
+                                        {{ $rec['type'] === 'reduce' ? 'KURANGI BOBOT' : 'TAMBAH HEDGING' }}
+                                    </span>
+                                </div>
+                                <h4 class="text-sm font-bold text-slate-900 leading-snug">{{ $rec['title'] }}</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">{{ $rec['reason'] }}</p>
+                            </div>
+
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-blue-700 flex items-center gap-2 shadow-2xs">
+                                <span class="text-base shrink-0">👉</span>
+                                <span>{{ $rec['action'] }}</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
             <!-- Footer -->

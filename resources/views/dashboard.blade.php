@@ -51,7 +51,7 @@
 
     <!-- Mobile Drawer -->
     <div x-show="mobileMenuOpen" x-cloak class="sm:hidden fixed inset-0 z-50 bg-slate-900/60 no-print" @click="mobileMenuOpen = false">
-        <div class="w-64 h-full bg-white shadow-xl" @click.stop>
+        <div class="w-52 h-full bg-white shadow-xl" @click.stop>
             @include('layouts.sidebar')
         </div>
     </div>
