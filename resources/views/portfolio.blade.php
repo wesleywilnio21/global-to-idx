@@ -329,165 +329,198 @@
                 </div>
             </div>
 
-            <!-- 4. Two-Column Breakdown: Holdings Analytics & AI Rebalancing Plan -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <!-- 4. FULL-WIDTH CARD: KONTRIBUSI DAMPAK TIAP SAHAM -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col gap-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-5">
+                    <div>
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">Dekomposisi Portofolio</span>
+                        <h3 class="text-xl font-bold text-slate-900">Kontribusi Dampak Tiap Saham</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Dekomposisi skor individual emiten dan kontribusi terbobot terhadap ketahanan total portofolio.</p>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            {{ count($analyzedHoldings) }} Saham Teranalisis
+                        </span>
+                    </div>
+                </div>
 
-                <!-- Left Column (2 Cols): Holdings Analytics Table -->
-                <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-6">
+                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-semibold uppercase tracking-wider select-none">
+                                    <th class="px-6 py-4">Ticker & Nama Emiten</th>
+                                    <th class="px-5 py-4 text-center">Sektor</th>
+                                    <th class="px-6 py-4 text-right">Bobot Alokasi</th>
+                                    <th class="px-5 py-4 text-right">Leverage (DER)</th>
+                                    <th class="px-5 py-4 text-right">Margin Laba (NPM)</th>
+                                    <th class="px-5 py-4 text-center">Skor Fundamental</th>
+                                    <th class="px-6 py-4 text-right">Kontribusi Bersih</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-sm num-tabular">
+                                @foreach($analyzedHoldings as $item)
+                                    @php
+                                        $comp = $item['company'];
+                                        $score = $item['company_score'];
+                                        $contrib = $item['weighted_contribution'];
+                                    @endphp
+                                    <tr class="hover:bg-slate-50/60 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs font-mono {{ $score > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs' : ($score < 0 ? 'bg-rose-50 text-rose-700 border border-rose-200 shadow-2xs' : 'bg-slate-100 text-slate-700 border border-slate-200') }}">
+                                                    {{ substr($comp->symbol, 0, 2) }}
+                                                </div>
+                                                <div>
+                                                    <span class="font-bold text-slate-900 text-sm block">{{ $comp->symbol }}</span>
+                                                    <span class="text-xs text-slate-400 font-sans block">{{ $comp->name }}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-5 py-4 text-center">
+                                            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80">
+                                                {{ $item['sector_name'] }}
+                                            </span>
+                                        </td>
+
+                                        <td class="px-6 py-4 text-right">
+                                            <div class="flex flex-col items-end">
+                                                <span class="font-bold text-slate-900 text-sm">{{ $item['weight'] }}%</span>
+                                                <div class="w-20 bg-slate-100 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                                                    <div class="bg-blue-600 h-full rounded-full" style="width: {{ min(100, $item['weight']) }}%"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-5 py-4 text-right font-semibold {{ $item['der'] > 1.2 ? 'text-rose-600' : 'text-slate-700' }}">
+                                            <div class="flex flex-col items-end">
+                                                <span class="font-bold">{{ $item['der'] }}x</span>
+                                                <span class="text-[10px] {{ $item['der'] > 1.2 ? 'text-rose-500 font-semibold' : 'text-slate-400 font-normal' }}">
+                                                    {{ $item['der'] > 1.2 ? 'Tinggi' : 'Sehat' }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-5 py-4 text-right font-semibold {{ $item['npm'] < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
+                                            <div class="flex flex-col items-end">
+                                                <span class="font-bold">{{ $item['npm'] }}%</span>
+                                                <span class="text-[10px] {{ $item['npm'] < 0 ? 'text-rose-500 font-semibold' : 'text-emerald-500 font-normal' }}">
+                                                    {{ $item['npm'] < 0 ? 'Defisit' : 'Sehat' }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-5 py-4 text-center">
+                                            <span class="px-3 py-1 rounded-full text-xs font-bold inline-block {{ $score > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($score < 0 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200') }}">
+                                                {{ $score > 0 ? '+' : '' }}{{ $score }}
+                                            </span>
+                                        </td>
+
+                                        <td class="px-6 py-4 text-right">
+                                            <span class="font-extrabold text-base {{ $contrib > 0 ? 'text-emerald-600' : ($contrib < 0 ? 'text-rose-600' : 'text-slate-600') }}">
+                                                {{ $contrib > 0 ? '+' : '' }}{{ $contrib }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. TWO-COLUMN SPLIT (BAGI DUA SPACE): DIAGNOSTIK EKSTREM & REKOMENDASI REBALANCING -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+                <!-- Left Column (50%): Diagnostik Saham Ekstrem -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-sm flex flex-col gap-5 h-full">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                         <div>
-                            <h3 class="text-base font-bold text-slate-900">Kontribusi Dampak Tiap Saham</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Dekomposisi skor individual dan kontribusi berbobot masing-masing saham.</p>
+                            <span class="text-xs font-bold text-amber-600 uppercase tracking-wider block mb-0.5">Analisis Ekstremitas</span>
+                            <h3 class="text-base font-bold text-slate-900">Diagnostik Saham Ekstrem</h3>
                         </div>
+                        <span class="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold rounded-lg">
+                            Outliers
+                        </span>
                     </div>
 
-                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-semibold uppercase tracking-wider">
-                                        <th class="px-5 py-3.5">Ticker / Nama</th>
-                                        <th class="px-5 py-3.5 text-center">Sektor</th>
-                                        <th class="px-5 py-3.5 text-right">Bobot</th>
-                                        <th class="px-5 py-3.5 text-right">DER</th>
-                                        <th class="px-5 py-3.5 text-right">NPM</th>
-                                        <th class="px-5 py-3.5 text-center">Skor Saham</th>
-                                        <th class="px-5 py-3.5 text-right">Kontribusi</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 text-sm num-tabular">
-                                    @foreach($analyzedHoldings as $item)
-                                        @php
-                                            $comp = $item['company'];
-                                            $score = $item['company_score'];
-                                            $contrib = $item['weighted_contribution'];
-                                        @endphp
-                                        <tr class="hover:bg-slate-50/60 transition-colors">
-                                            <td class="px-5 py-4">
-                                                <div class="flex items-center gap-2.5">
-                                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs font-mono {{ $score > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($score < 0 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200') }}">
-                                                        {{ substr($comp->symbol, 0, 2) }}
-                                                    </div>
-                                                    <div>
-                                                        <span class="font-bold text-slate-900 block">{{ $comp->symbol }}</span>
-                                                        <span class="text-xs text-slate-400 font-sans truncate max-w-[140px] block">{{ $comp->name }}</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <td class="px-5 py-4 text-center">
-                                                <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                                                    {{ $item['sector_name'] }}
-                                                </span>
-                                            </td>
-
-                                            <td class="px-5 py-4 text-right font-bold text-slate-900">
-                                                {{ $item['weight'] }}%
-                                            </td>
-
-                                            <td class="px-5 py-4 text-right font-semibold {{ $item['der'] > 1.2 ? 'text-rose-600' : 'text-slate-700' }}">
-                                                {{ $item['der'] }}x
-                                            </td>
-
-                                            <td class="px-5 py-4 text-right font-semibold {{ $item['npm'] < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
-                                                {{ $item['npm'] }}%
-                                            </td>
-
-                                            <td class="px-5 py-4 text-center font-bold">
-                                                <span class="px-2 py-0.5 rounded-full text-xs {{ $score > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($score < 0 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200') }}">
-                                                    {{ $score > 0 ? '+' : '' }}{{ $score }}
-                                                </span>
-                                            </td>
-
-                                            <td class="px-5 py-4 text-right font-bold {{ $contrib > 0 ? 'text-emerald-600' : ($contrib < 0 ? 'text-rose-600' : 'text-slate-600') }}">
-                                                {{ $contrib > 0 ? '+' : '' }}{{ $contrib }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                    <!-- Top Protector Card -->
+                    @if($topProtector)
+                        <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-start gap-3.5">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-bold text-lg shadow-2xs">
+                                🛡️
+                            </div>
+                            <div class="flex-1">
+                                <span class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">Penyelamat Portofolio (Top Protector)</span>
+                                <span class="font-bold text-slate-900 text-sm block mt-0.5">
+                                    {{ $topProtector['company']->symbol }} — {{ $topProtector['company']->name }}
+                                </span>
+                                <p class="text-xs text-emerald-800/90 mt-1.5 leading-relaxed">
+                                    Memberikan bantalan positif sebesar <strong class="font-bold text-emerald-900">+{{ $topProtector['weighted_contribution'] }} poin</strong> pada portofolio berkat daya tahan sektor {{ $topProtector['sector_name'] }} dan rasio fundamental yang solid.
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    @endif
+
+                    <!-- Top Risk Drag Card -->
+                    @if($topRiskDrag)
+                        <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200 flex items-start gap-3.5">
+                            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-lg shadow-2xs">
+                                ⚠️
+                            </div>
+                            <div class="flex-1">
+                                <span class="text-[11px] font-bold text-rose-800 uppercase tracking-wider block">Beban Terberat (Top Risk Drag)</span>
+                                <span class="font-bold text-slate-900 text-sm block mt-0.5">
+                                    {{ $topRiskDrag['company']->symbol }} — {{ $topRiskDrag['company']->name }}
+                                </span>
+                                <p class="text-xs text-rose-800/90 mt-1.5 leading-relaxed">
+                                    Menggerus skor portofolio sebesar <strong class="font-bold text-rose-900">{{ $topRiskDrag['weighted_contribution'] }} poin</strong> akibat rasio utang DER {{ $topRiskDrag['der'] }}x yang rentan terhadap beban bunga krisis.
+                                </p>
+                            </div>
+                        </div>
+                    @else
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                            Tidak ada saham yang tertekan secara kritis dalam konfigurasi portofolio ini.
+                        </div>
+                    @endif
                 </div>
 
-                <!-- Right Column (1 Col): AI Diagnostic & Rebalancing Plan -->
-                <div class="flex flex-col gap-6">
-
-                    <!-- Shock Absorber & Risk Drag Cards -->
-                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-5">
-                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
-                            Diagnostik Saham Ekstrem
-                        </h3>
-
-                        <!-- Top Protector -->
-                        @if($topProtector)
-                            <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-start gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-bold text-sm">
-                                    🛡️
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-emerald-800 block">Penyelamat Portofolio (Top Protector):</span>
-                                    <span class="font-bold text-slate-900 text-sm block mt-0.5">
-                                        {{ $topProtector['company']->symbol }} ({{ $topProtector['company']->name }})
-                                    </span>
-                                    <p class="text-xs text-emerald-700 mt-1 leading-relaxed">
-                                        Memberikan bantalan positif sebesar <strong>+{{ $topProtector['weighted_contribution'] }} poin</strong> pada portofolio berkat daya tahan sektor {{ $topProtector['sector_name'] }}.
-                                    </p>
-                                </div>
-                            </div>
-                        @endif
-
-                        <!-- Top Risk Drag -->
-                        @if($topRiskDrag)
-                            <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200 flex items-start gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-sm">
-                                    ⚠️
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-rose-800 block">Beban Terberat (Top Risk Drag):</span>
-                                    <span class="font-bold text-slate-900 text-sm block mt-0.5">
-                                        {{ $topRiskDrag['company']->symbol }} ({{ $topRiskDrag['company']->name }})
-                                    </span>
-                                    <p class="text-xs text-rose-700 mt-1 leading-relaxed">
-                                        Menggerus skor portofolio sebesar <strong>{{ $topRiskDrag['weighted_contribution'] }} poin</strong> akibat rasio DER {{ $topRiskDrag['der'] }}x.
-                                    </p>
-                                </div>
-                            </div>
-                        @else
-                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
-                                Tidak ada saham yang tertekan secara kritis dalam portofolio ini.
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- AI Rebalancing Action Plan -->
-                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-4">
-                        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <!-- Right Column (50%): Rekomendasi Rebalancing AI -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-sm flex flex-col gap-5 h-full">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                        <div class="flex items-center gap-2">
                             <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
-                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                                Rekomendasi Rebalancing AI
-                            </h3>
+                            <div>
+                                <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-0.5">Kecerdasan Buatan</span>
+                                <h3 class="text-base font-bold text-slate-900">Rekomendasi Rebalancing AI</h3>
+                            </div>
                         </div>
+                        <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold rounded-lg">
+                            Action Plan
+                        </span>
+                    </div>
 
-                        <div class="flex flex-col gap-3">
-                            @foreach($recommendations as $rec)
-                                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/40 flex flex-col gap-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase {{ $rec['type'] === 'reduce' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700' }}">
-                                            {{ $rec['type'] === 'reduce' ? 'KURANGI BOBOT' : 'TAMBAH HEDGING' }}
-                                        </span>
-                                        <h4 class="text-xs font-bold text-slate-900">{{ $rec['title'] }}</h4>
-                                    </div>
-                                    <p class="text-xs text-slate-600 leading-relaxed">{{ $rec['reason'] }}</p>
-                                    <div class="p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-blue-700 flex items-center gap-2">
-                                        <span>👉</span>
-                                        <span>{{ $rec['action'] }}</span>
-                                    </div>
+                    <div class="flex flex-col gap-3.5">
+                        @foreach($recommendations as $rec)
+                            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/40 flex flex-col gap-2.5 hover:border-slate-300 transition-colors">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $rec['type'] === 'reduce' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200' }}">
+                                        {{ $rec['type'] === 'reduce' ? 'KURANGI BOBOT' : 'TAMBAH HEDGING' }}
+                                    </span>
+                                    <h4 class="text-xs font-bold text-slate-900">{{ $rec['title'] }}</h4>
                                 </div>
-                            @endforeach
-                        </div>
+                                <p class="text-xs text-slate-600 leading-relaxed">{{ $rec['reason'] }}</p>
+                                <div class="p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-blue-700 flex items-center gap-2 shadow-2xs">
+                                    <span class="text-sm">👉</span>
+                                    <span>{{ $rec['action'] }}</span>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
+
             </div>
 
             <!-- Footer -->
