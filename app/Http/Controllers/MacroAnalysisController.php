@@ -69,6 +69,7 @@ class MacroAnalysisController extends Controller
                                 'impact_score' => $data['impact_score'],
                                 'resilience_status' => $data['resilience_status'],
                                 'reasoning' => $data['reasoning'],
+                                'score_breakdown' => $data['score_breakdown'] ?? null,
                                 'vulnerable_companies' => $data['vulnerable_companies'] ?? [],
                                 'beneficiary_companies' => $data['beneficiary_companies'] ?? [],
                             ]
@@ -112,6 +113,14 @@ class MacroAnalysisController extends Controller
                     'impact_score' => 0,
                     'resilience_status' => 'Neutral',
                     'reasoning' => 'Kondisi netral. Belum ada skenario transmisi makro yang diaplikasikan ke sektor ini.',
+                    'score_breakdown' => [
+                        'revenue_impact' => 0,
+                        'revenue_note' => 'Pendapatan sektor stabil, tidak terpapar guncangan makro.',
+                        'cost_impact' => 0,
+                        'cost_note' => 'Beban pokok penjualan & rantai pasok dalam kondisi normal.',
+                        'balance_sheet_impact' => 0,
+                        'balance_sheet_note' => 'Struktur permodalan (DER) dan marjin (NPM) seimbang.',
+                    ],
                     'vulnerable_companies' => [],
                     'beneficiary_companies' => [],
                 ];
@@ -127,6 +136,7 @@ class MacroAnalysisController extends Controller
                     'score' => $r->impact_score,
                     'status' => $r->resilience_status,
                     'reasoning' => $r->reasoning,
+                    'score_breakdown' => $r->score_breakdown,
                     'avg_der' => (float) $r->sector->avg_der,
                     'avg_npm' => (float) $r->sector->avg_npm,
                     'vulnerable_companies' => $r->vulnerable_companies ?? [],

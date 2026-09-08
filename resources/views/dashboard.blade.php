@@ -408,6 +408,99 @@
                 </div>
             </div>
 
+            <!-- Collapsible Score Breakdown Dropdown (Ringkas, Tidak Bikin Scroll Panjang) -->
+            <div x-data="{ openBreakdown: false }" class="border border-slate-200 rounded-xl overflow-hidden bg-white">
+                <button type="button" 
+                        @click="openBreakdown = !openBreakdown" 
+                        class="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/80 hover:bg-slate-100/90 transition-colors text-left select-none cursor-pointer">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-900">Rincian Dekomposisi Skor 3 Pilar Transmisi</span>
+                            <span class="text-[11px] text-slate-500 hidden sm:inline ml-1.5">(Dampak Pendapatan, Sensitivitas Biaya & Neraca)</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-500">
+                        <span class="text-xs font-medium" x-text="openBreakdown ? 'Tutup Rincian' : 'Buka Rincian (+/-)'"></span>
+                        <svg class="w-4 h-4 transform transition-transform duration-200" :class="openBreakdown ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                </button>
+
+                <!-- Dropdown Content -->
+                <div x-show="openBreakdown" x-cloak class="p-5 border-t border-slate-100 bg-white">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Pilar 1: Pendapatan -->
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-between gap-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">📈</span>
+                                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">1. Pendapatan (Omset)</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-md text-xs font-bold font-mono"
+                                      :class="(activeSector?.score_breakdown?.revenue_impact ?? 0) > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ((activeSector?.score_breakdown?.revenue_impact ?? 0) < 0 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200')"
+                                      x-text="((activeSector?.score_breakdown?.revenue_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.revenue_impact ?? 0)">
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed" x-text="activeSector?.score_breakdown?.revenue_note || 'Dampak netral terhadap pendapatan.'"></p>
+                        </div>
+
+                        <!-- Pilar 2: Biaya & Pasok -->
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-between gap-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">📦</span>
+                                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">2. Biaya & Pasok</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-md text-xs font-bold font-mono"
+                                      :class="(activeSector?.score_breakdown?.cost_impact ?? 0) > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ((activeSector?.score_breakdown?.cost_impact ?? 0) < 0 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200')"
+                                      x-text="((activeSector?.score_breakdown?.cost_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.cost_impact ?? 0)">
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed" x-text="activeSector?.score_breakdown?.cost_note || 'Beban operasional & rantai pasok stabil.'"></p>
+                        </div>
+
+                        <!-- Pilar 3: Neraca (DER/NPM) -->
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-between gap-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">⚖️</span>
+                                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">3. Neraca (DER & NPM)</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-md text-xs font-bold font-mono"
+                                      :class="(activeSector?.score_breakdown?.balance_sheet_impact ?? 0) > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ((activeSector?.score_breakdown?.balance_sheet_impact ?? 0) < 0 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200')"
+                                      x-text="((activeSector?.score_breakdown?.balance_sheet_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.balance_sheet_impact ?? 0)">
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed" x-text="activeSector?.score_breakdown?.balance_sheet_note || 'Struktur permodalan dan solvabilitas seimbang.'"></p>
+                        </div>
+                    </div>
+
+                    <!-- Formula Sum Bar -->
+                    <div class="mt-4 pt-3.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
+                        <div class="flex items-center gap-1.5 flex-wrap font-mono">
+                            <span class="font-sans text-slate-600 font-semibold">Formula Total:</span>
+                            <span class="font-semibold text-slate-700" x-text="'(' + ((activeSector?.score_breakdown?.revenue_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.revenue_impact ?? 0) + ' Pendapatan)'"></span>
+                            <span>+</span>
+                            <span class="font-semibold text-slate-700" x-text="'(' + ((activeSector?.score_breakdown?.cost_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.cost_impact ?? 0) + ' Biaya)'"></span>
+                            <span>+</span>
+                            <span class="font-semibold text-slate-700" x-text="'(' + ((activeSector?.score_breakdown?.balance_sheet_impact ?? 0) > 0 ? '+' : '') + (activeSector?.score_breakdown?.balance_sheet_impact ?? 0) + ' Neraca)'"></span>
+                            <span>=</span>
+                            <span class="px-2 py-0.5 rounded font-bold"
+                                  :class="activeSector?.score > 0 ? 'bg-emerald-50 text-emerald-700' : (activeSector?.score < 0 ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-700')"
+                                  x-text="'Skor Total ' + (activeSector?.score > 0 ? '+' : '') + (activeSector?.score ?? 0)">
+                            </span>
+                        </div>
+                        <span class="text-[11px] text-slate-400">Skala -10 (Kritis) s.d +10 (Sangat Diuntungkan)</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Companies List Table -->
             <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
                 <div class="overflow-x-auto custom-scrollbar">

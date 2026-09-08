@@ -182,10 +182,18 @@ TUGAS ANDA:
    - 0: Neutral / Netral
    - -1 s.d -5: Vulnerable / Tertekan
    - -6 s.d -10: Critical / Beban Berat
-2. Tentukan status 'resilience_status': ('Resilient', 'Neutral', 'Vulnerable', 'Critical')
-3. Berikan penalaran ekonomi singkat, tajam, dan realistis dalam Bahasa Indonesia (2-3 kalimat) mengenai jalur transmisi dampaknya.
-4. Identifikasi 1-2 ticker emiten yang paling rentan (vulnerable_companies) dan paling diuntungkan (beneficiary_companies) di sektor tersebut berdasarkan data fundamental di atas.
-5. Buat ringkasan eksekutif 2-3 kalimat mengenai pengaruh makro ini terhadap IHSG secara keseluruhan.
+2. Berikan rincian dekomposisi skor 3 pilar (score_breakdown) sedemikian rupa sehingga:
+   (revenue_impact + cost_impact + balance_sheet_impact = impact_score):
+   - revenue_impact (-5 s.d +5): dampak ke omset & volume penjualan
+   - revenue_note: alasan singkat (1 kalimat padat)
+   - cost_impact (-5 s.d +5): sensitivitas beban operasional, COGS, impor, inflasi
+   - cost_note: alasan singkat (1 kalimat padat)
+   - balance_sheet_impact (-5 s.d +5): ketahanan neraca, beban utang (DER), & margin (NPM)
+   - balance_sheet_note: alasan singkat (1 kalimat padat)
+3. Tentukan status 'resilience_status': ('Resilient', 'Neutral', 'Vulnerable', 'Critical')
+4. Berikan penalaran ekonomi singkat, tajam, dan realistis dalam Bahasa Indonesia (2-3 kalimat) mengenai jalur transmisi dampaknya.
+5. Identifikasi 1-2 ticker emiten yang paling rentan (vulnerable_companies) dan paling diuntungkan (beneficiary_companies) di sektor tersebut berdasarkan data fundamental di atas.
+6. Buat ringkasan eksekutif 2-3 kalimat mengenai pengaruh makro ini terhadap IHSG secara keseluruhan.
 
 Kembalikan respon HANYA dalam JSON valid dengan struktur berikut:
 {
@@ -196,6 +204,14 @@ Kembalikan respon HANYA dalam JSON valid dengan struktur berikut:
       "impact_score": 7,
       "resilience_status": "Resilient",
       "reasoning": "Penjelasan alasan ekonomi...",
+      "score_breakdown": {
+        "revenue_impact": 4,
+        "revenue_note": "Lonjakan harga komoditas global mendongkrak omset ekspor.",
+        "cost_impact": 0,
+        "cost_note": "Beban operasional domestik tetap stabil.",
+        "balance_sheet_impact": 3,
+        "balance_sheet_note": "Struktur utang DER rendah (0.62x) dan kas valas melimpah."
+      },
       "vulnerable_companies": ["TICKER"],
       "beneficiary_companies": ["TICKER"]
     },
@@ -325,10 +341,26 @@ PROMPT;
                 }
             }
 
+            $rev = (int) round($score * 0.5);
+            $cost = (int) round($score * 0.25);
+            $bal = $score - $rev - $cost;
+
+            $revNote = $rev > 0 ? 'Katalis volume & harga penjualan sektor.' : ($rev < 0 ? 'Penurunan permintaan / omset penjualan.' : 'Dampak pendapatan netral.');
+            $costNote = $cost > 0 ? 'Beban operasional & impor terkendali.' : ($cost < 0 ? 'Kenaikan biaya input / efek kurs valas.' : 'Beban pokok penjualan stabil.');
+            $balNote = $bal > 0 ? 'Kas kuat & rasio utang (DER) terjaga.' : ($bal < 0 ? 'Beban bunga pinjaman / leverage utang tinggi.' : 'Neraca keuangan seimbang.');
+
             $results[$code] = [
                 'impact_score' => $score,
                 'resilience_status' => $status,
                 'reasoning' => $reasoning,
+                'score_breakdown' => [
+                    'revenue_impact' => $rev,
+                    'revenue_note' => $revNote,
+                    'cost_impact' => $cost,
+                    'cost_note' => $costNote,
+                    'balance_sheet_impact' => $bal,
+                    'balance_sheet_note' => $balNote,
+                ],
                 'vulnerable_companies' => array_values($vulnerable),
                 'beneficiary_companies' => array_values($beneficiary),
             ];
