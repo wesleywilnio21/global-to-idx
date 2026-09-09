@@ -51,16 +51,26 @@
                 <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('duel.*') ? 'bg-blue-500 text-white' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">VS</span>
             </a>
 
-            <p class="px-3 pt-4 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Aksi & Ekspor</p>
+            <!-- 4. Macro Tear-Sheet & PDF Report -->
+            <a href="{{ route('report.tear-sheet') }}" 
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all {{ request()->routeIs('report.*') ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('report.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span>Riset & Tear-Sheet</span>
+                <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('report.*') ? 'bg-blue-500 text-white' : 'bg-purple-50 text-purple-700 border border-purple-200' }}">PDF</span>
+            </a>
 
-            <!-- 3. Export PDF Report Trigger -->
+            <p class="px-3 pt-4 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Aksi Cepat</p>
+
+            <!-- Quick Print / PDF Trigger -->
             <button type="button" 
                     onclick="window.print()" 
                     class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all text-left cursor-pointer">
                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                 </svg>
-                <span>Cetak / Ekspor PDF</span>
+                <span>Cetak / Cetak PDF</span>
             </button>
         </div>
     </div>
