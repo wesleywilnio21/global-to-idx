@@ -38,7 +38,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                 </svg>
                 <span>Stress-Test Portofolio</span>
-                <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('portfolio.*') ? 'bg-blue-500 text-white' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }}">Baru</span>
+                <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('portfolio.*') ? 'bg-blue-500 text-white' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }}">Fitur</span>
+            </a>
+
+            <!-- 3. Head-to-Head Duel -->
+            <a href="{{ route('duel.index') }}" 
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all {{ request()->routeIs('duel.*') ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('duel.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span>Head-to-Head Duel</span>
+                <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('duel.*') ? 'bg-blue-500 text-white' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">VS</span>
             </a>
 
             <p class="px-3 pt-4 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Aksi & Ekspor</p>

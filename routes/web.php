@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HeadToHeadDuelController;
 use App\Http\Controllers\MacroAnalysisController;
 use App\Http\Controllers\PortfolioStressTestController;
 use Illuminate\Http\Request;
@@ -9,6 +10,7 @@ Route::get('/', [MacroAnalysisController::class, 'index'])->name('dashboard');
 Route::post('/analyze', [MacroAnalysisController::class, 'analyze'])->name('analyze');
 Route::post('/sectors/sync', [MacroAnalysisController::class, 'syncSectors'])->name('sectors.sync');
 Route::match(['get', 'post'], '/portfolio', [PortfolioStressTestController::class, 'index'])->name('portfolio.index');
+Route::match(['get', 'post'], '/duel', [HeadToHeadDuelController::class, 'index'])->name('duel.index');
 
 Route::get('/upload-preview', function () {
     return view('upload-preview');
