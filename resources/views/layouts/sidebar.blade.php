@@ -69,6 +69,7 @@
                 </svg>
                 <span>Red-Line Scanner</span>
                 <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('scanner.*') ? 'bg-blue-500 text-white' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">EWS</span>
+            </a>
         </div>
     </div>
 
