@@ -31,6 +31,15 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+        /* Clean Number Input - Hide ugly browser spin arrows */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body class="min-h-full flex flex-col sm:flex-row bg-slate-50 text-slate-800 antialiased selection:bg-blue-600 selection:text-white"
@@ -178,48 +187,64 @@
                 </div>
 
                 <!-- Custom Parameter Inline Deck -->
-                <form method="GET" action="{{ route('scanner.index') }}" class="pt-3 border-t border-slate-100">
+                <form method="GET" action="{{ route('scanner.index') }}" class="pt-4 border-t border-slate-100 flex flex-col gap-4">
                     <input type="hidden" name="zone_filter" value="{{ $zoneFilter }}">
                     <input type="hidden" name="sector_filter" value="{{ $sectorFilter }}">
                     <input type="hidden" name="sort_by" value="{{ $sortBy }}">
                     <input type="hidden" name="per_page" value="{{ $perPage }}">
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-end">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- Input 1: Suku Bunga -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">Kenaikan Suku Bunga Acuan</label>
-                            <div class="relative">
+                            <div class="flex rounded-xl border border-slate-300 bg-white hover:border-slate-400 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all overflow-hidden h-10 shadow-2xs">
                                 <input type="number" name="rate_hike" value="{{ $rateHike }}" min="0" max="500" step="25"
-                                       class="w-full text-xs font-mono bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all pr-12" />
-                                <span class="absolute right-3.5 top-2.5 text-xs text-slate-400 font-mono font-semibold">bps</span>
+                                       class="w-full text-xs font-mono font-semibold px-3 py-2 text-slate-900 bg-transparent border-0 focus:outline-none" />
+                                <span class="inline-flex items-center px-3 bg-slate-100 border-l border-slate-200 text-xs font-mono font-bold text-slate-500 select-none shrink-0">
+                                    bps
+                                </span>
                             </div>
                         </div>
 
+                        <!-- Input 2: Kurs USD -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">Target Nilai Tukar USD / IDR</label>
-                            <div class="relative">
+                            <div class="flex rounded-xl border border-slate-300 bg-white hover:border-slate-400 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all overflow-hidden h-10 shadow-2xs">
                                 <input type="number" name="usd_rate" value="{{ $usdRate }}" min="15000" max="22000" step="100"
-                                       class="w-full text-xs font-mono bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all pr-12" />
-                                <span class="absolute right-3.5 top-2.5 text-xs text-slate-400 font-mono font-semibold">IDR</span>
+                                       class="w-full text-xs font-mono font-semibold px-3 py-2 text-slate-900 bg-transparent border-0 focus:outline-none" />
+                                <span class="inline-flex items-center px-3 bg-slate-100 border-l border-slate-200 text-xs font-mono font-bold text-slate-500 select-none shrink-0">
+                                    IDR
+                                </span>
                             </div>
                         </div>
 
+                        <!-- Input 3: Inflasi COGS -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">Inflasi Biaya Bahan Baku (COGS)</label>
-                            <div class="relative">
+                            <div class="flex rounded-xl border border-slate-300 bg-white hover:border-slate-400 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all overflow-hidden h-10 shadow-2xs">
                                 <input type="number" name="cogs_inflation" value="{{ $cogsInflation }}" min="0" max="20" step="0.5"
-                                       class="w-full text-xs font-mono bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all pr-8" />
-                                <span class="absolute right-3.5 top-2.5 text-xs text-slate-400 font-mono font-semibold">%</span>
+                                       class="w-full text-xs font-mono font-semibold px-3 py-2 text-slate-900 bg-transparent border-0 focus:outline-none" />
+                                <span class="inline-flex items-center px-3.5 bg-slate-100 border-l border-slate-200 text-xs font-mono font-bold text-slate-500 select-none shrink-0">
+                                    %
+                                </span>
                             </div>
                         </div>
+                    </div>
 
-                        <div>
-                            <button type="submit" class="w-full h-[39px] px-4 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                                <span>Pindai Ulang Red-Line</span>
-                            </button>
+                    <!-- Action Bar with Submit Button -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                        <div class="flex items-center gap-2 text-xs text-slate-500">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>Atur angka kustom di atas untuk simulasi stres, lalu jalankan pemindaian ulang solvabilitas.</span>
                         </div>
+                        <button type="submit" class="px-5 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <span>Pindai Ulang Red-Line</span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -271,32 +296,29 @@
 
                         <div class="space-y-3">
                             @foreach($topVulnerable as $item)
-                                <div class="p-4 bg-slate-50 hover:bg-rose-50/40 rounded-xl border border-slate-200/80 hover:border-rose-200 transition-all flex items-center justify-between gap-3">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 border border-rose-200 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+                                <div class="p-3.5 sm:p-4 bg-slate-50/80 hover:bg-rose-50/50 rounded-xl border border-slate-200/80 hover:border-rose-200 transition-all flex items-center justify-between gap-4">
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 border border-rose-200 flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-2xs">
                                             {{ substr($item['symbol'], 0, 2) }}
                                         </div>
-                                        <div>
+                                        <div class="min-w-0">
                                             <div class="flex items-center gap-2">
-                                                <span class="text-sm font-extrabold text-slate-900">{{ $item['symbol'] }}</span>
-                                                <span class="text-xs text-slate-500">{{ $item['sector_name'] }}</span>
+                                                <span class="text-sm font-black text-slate-900">{{ $item['symbol'] }}</span>
+                                                <span class="text-xs text-slate-400 font-medium truncate">{{ $item['sector_name'] }}</span>
                                             </div>
-                                            <span class="inline-block mt-0.5 text-[11px] font-semibold text-rose-700">
+                                            <p class="text-xs font-semibold text-rose-600 mt-1 truncate">
                                                 {{ $item['risk_verdict'] }}
-                                            </span>
+                                            </p>
                                         </div>
                                     </div>
 
                                     <div class="text-right shrink-0">
-                                        <div class="text-[11px] text-slate-400 font-mono">NPM Awal &rarr; Proyeksi</div>
-                                        <div class="text-xs font-bold num-tabular flex items-center justify-end gap-1.5 mt-0.5">
-                                            <span class="text-slate-400 font-normal">{{ $item['npm'] }}%</span>
-                                            <span class="text-slate-400">&rarr;</span>
-                                            <span class="text-rose-700 font-extrabold text-sm">{{ $item['projected_npm'] }}%</span>
+                                        <div class="text-sm sm:text-base font-extrabold text-rose-600 font-mono">
+                                            {{ $item['projected_npm'] }}%
                                         </div>
-                                        <span class="text-[10px] font-mono font-semibold text-rose-600">
-                                            Shock: -{{ $item['total_compression'] }}%
-                                        </span>
+                                        <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                                            Awal {{ $item['npm'] }}% <span class="text-rose-600 font-bold">(-{{ $item['total_compression'] }}%)</span>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
@@ -322,32 +344,29 @@
 
                         <div class="space-y-3">
                             @foreach($topResilient as $item)
-                                <div class="p-4 bg-slate-50 hover:bg-emerald-50/40 rounded-xl border border-slate-200/80 hover:border-emerald-200 transition-all flex items-center justify-between gap-3">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+                                <div class="p-3.5 sm:p-4 bg-slate-50/80 hover:bg-emerald-50/50 rounded-xl border border-slate-200/80 hover:border-emerald-200 transition-all flex items-center justify-between gap-4">
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-2xs">
                                             {{ substr($item['symbol'], 0, 2) }}
                                         </div>
-                                        <div>
+                                        <div class="min-w-0">
                                             <div class="flex items-center gap-2">
-                                                <span class="text-sm font-extrabold text-slate-900">{{ $item['symbol'] }}</span>
-                                                <span class="text-xs text-slate-500">{{ $item['sector_name'] }}</span>
+                                                <span class="text-sm font-black text-slate-900">{{ $item['symbol'] }}</span>
+                                                <span class="text-xs text-slate-400 font-medium truncate">{{ $item['sector_name'] }}</span>
                                             </div>
-                                            <span class="inline-block mt-0.5 text-[11px] font-semibold text-emerald-700">
+                                            <p class="text-xs font-semibold text-emerald-700 mt-1 truncate">
                                                 {{ $item['risk_verdict'] }}
-                                            </span>
+                                            </p>
                                         </div>
                                     </div>
 
                                     <div class="text-right shrink-0">
-                                        <div class="text-[11px] text-slate-400 font-mono">NPM Awal &rarr; Proyeksi</div>
-                                        <div class="text-xs font-bold num-tabular flex items-center justify-end gap-1.5 mt-0.5">
-                                            <span class="text-slate-400 font-normal">{{ $item['npm'] }}%</span>
-                                            <span class="text-slate-400">&rarr;</span>
-                                            <span class="text-emerald-700 font-extrabold text-sm">{{ $item['projected_npm'] }}%</span>
+                                        <div class="text-sm sm:text-base font-extrabold text-emerald-700 font-mono">
+                                            {{ $item['projected_npm'] }}%
                                         </div>
-                                        <span class="text-[10px] font-mono font-semibold text-emerald-600">
-                                            Buffer: +{{ $item['projected_npm'] }}%
-                                        </span>
+                                        <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                                            Awal {{ $item['npm'] }}% <span class="text-emerald-600 font-bold">(+{{ $item['projected_npm'] }}%)</span>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
@@ -398,10 +417,19 @@
                             </div>
 
                             <!-- Metric Pills -->
-                            <div class="flex items-center justify-between text-xs font-mono pt-1 border-t border-slate-200/60">
-                                <span class="text-rose-700 font-semibold">Kritis: <strong>{{ $sec['red_count'] }}</strong></span>
-                                <span class="text-amber-700 font-semibold">Waspada: <strong>{{ $sec['warning_count'] }}</strong></span>
-                                <span class="text-emerald-700 font-semibold">Aman: <strong>{{ $sec['safe_count'] }}</strong></span>
+                            <div class="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-slate-200/60">
+                                <span class="inline-flex items-center gap-1.5 text-rose-700 font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                    <span>{{ $sec['red_count'] }} Kritis</span>
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 text-amber-700 font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    <span>{{ $sec['warning_count'] }} Waspada</span>
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 text-emerald-700 font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span>{{ $sec['safe_count'] }} Aman</span>
+                                </span>
                             </div>
                         </div>
                     @endforeach
