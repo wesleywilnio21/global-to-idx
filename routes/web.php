@@ -4,6 +4,7 @@ use App\Http\Controllers\HeadToHeadDuelController;
 use App\Http\Controllers\MacroAnalysisController;
 use App\Http\Controllers\MacroReportController;
 use App\Http\Controllers\PortfolioStressTestController;
+use App\Http\Controllers\VulnerabilityScannerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,7 @@ Route::post('/sectors/sync', [MacroAnalysisController::class, 'syncSectors'])->n
 Route::match(['get', 'post'], '/portfolio', [PortfolioStressTestController::class, 'index'])->name('portfolio.index');
 Route::match(['get', 'post'], '/duel', [HeadToHeadDuelController::class, 'index'])->name('duel.index');
 Route::get('/report', [MacroReportController::class, 'tearSheet'])->name('report.tear-sheet');
+Route::match(['get', 'post'], '/scanner', [VulnerabilityScannerController::class, 'index'])->name('scanner.index');
 
 Route::get('/upload-preview', function () {
     return view('upload-preview');

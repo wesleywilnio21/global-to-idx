@@ -61,6 +61,16 @@
                 <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('report.*') ? 'bg-blue-500 text-white' : 'bg-purple-50 text-purple-700 border border-purple-200' }}">PDF</span>
             </a>
 
+            <!-- 5. Vulnerability & Red-Line Scanner -->
+            <a href="{{ route('scanner.index') }}" 
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all {{ request()->routeIs('scanner.*') ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('scanner.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span>Red-Line Scanner</span>
+                <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('scanner.*') ? 'bg-blue-500 text-white' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">EWS</span>
+            </a>
+
             <p class="px-3 pt-4 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Aksi Cepat</p>
 
             <!-- Quick Print / PDF Trigger -->
