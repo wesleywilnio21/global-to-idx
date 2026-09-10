@@ -655,18 +655,75 @@
         </main>
     </div>
 
-    <!-- Script to maintain position at table on pagination/filter -->
+    <!-- Script for Zero-Reload Seamless AJAX Pagination & Filter Updates -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (window.location.hash === '#daftar-emiten' || urlParams.has('page')) {
-                const tableEl = document.getElementById('daftar-emiten');
-                if (tableEl) {
-                    setTimeout(function () {
-                        tableEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 60);
+            const tableContainer = document.getElementById('daftar-emiten');
+            if (!tableContainer) return;
+
+            // Handle Pagination Link Clicks (Prev, 1, 2, Next)
+            tableContainer.addEventListener('click', function (e) {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('scanner')) {
+                    e.preventDefault();
+                    fetchAndUpdateTable(link.href);
+                }
+            });
+
+            // Handle Table Filter Changes (Zone, Sector, Sort, Per Page)
+            tableContainer.addEventListener('change', function (e) {
+                if (e.target.matches('select')) {
+                    e.preventDefault();
+                    const form = e.target.closest('form');
+                    if (form) {
+                        const formData = new FormData(form);
+                        const params = new URLSearchParams(formData);
+                        fetchAndUpdateTable('{{ route("scanner.index") }}?' + params.toString());
+                    }
+                }
+            });
+
+            async function fetchAndUpdateTable(url) {
+                // Save current exact scroll position
+                const currentScrollY = window.scrollY;
+                
+                // Subtle visual feedback during fetch
+                tableContainer.classList.add('transition-opacity', 'duration-150');
+                tableContainer.style.opacity = '0.5';
+
+                try {
+                    const response = await fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    
+                    if (!response.ok) throw new Error('Network error');
+                    
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTable = doc.getElementById('daftar-emiten');
+
+                    if (newTable) {
+                        tableContainer.innerHTML = newTable.innerHTML;
+                        // Update URL in browser address bar without reload
+                        window.history.pushState({ path: url }, '', url);
+                        // Ensure window stays exactly where it was
+                        window.scrollTo({ top: currentScrollY, behavior: 'instant' });
+                    } else {
+                        window.location.href = url;
+                    }
+                } catch (err) {
+                    console.error('AJAX pagination fallback:', err);
+                    window.location.href = url;
+                } finally {
+                    tableContainer.style.opacity = '1';
                 }
             }
+
+            // Handle browser Back / Forward buttons
+            window.addEventListener('popstate', function () {
+                window.location.reload();
+            });
         });
     </script>
 </body>
