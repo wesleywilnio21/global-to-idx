@@ -142,40 +142,49 @@
                 </div>
 
                 <!-- Interactive Parameter Custom Form -->
-                <form method="GET" action="{{ route('scanner.index') }}" class="mt-4 pt-4 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Kenaikan Suku Bunga</label>
-                        <div class="relative">
-                            <input type="number" name="rate_hike" value="{{ $rateHike }}" min="0" max="500" step="25"
-                                   class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" />
-                            <span class="absolute right-3 top-2 text-xs text-slate-400 font-mono">bps</span>
+                <form method="GET" action="{{ route('scanner.index') }}" class="mt-4 pt-4 border-t border-slate-200">
+                    <input type="hidden" name="zone_filter" value="{{ $zoneFilter }}">
+                    <input type="hidden" name="sector_filter" value="{{ $sectorFilter }}">
+                    <input type="hidden" name="sort_by" value="{{ $sortBy }}">
+                    <input type="hidden" name="per_page" value="{{ $perPage }}">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Kenaikan Suku Bunga</label>
+                            <div class="relative">
+                                <input type="number" name="rate_hike" value="{{ $rateHike }}" min="0" max="500" step="25"
+                                       class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 pr-10" />
+                                <span class="absolute right-3 top-2 text-xs text-slate-400 font-mono">bps</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Target Kurs USD/IDR</label>
+                            <div class="relative">
+                                <input type="number" name="usd_rate" value="{{ $usdRate }}" min="15000" max="22000" step="100"
+                                       class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 pr-10" />
+                                <span class="absolute right-3 top-2 text-xs text-slate-400 font-mono">IDR</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Inflasi Biaya Input (COGS)</label>
+                            <div class="relative">
+                                <input type="number" name="cogs_inflation" value="{{ $cogsInflation }}" min="0" max="20" step="0.5"
+                                       class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 pr-8" />
+                                <span class="absolute right-3 top-2 text-xs text-slate-400 font-mono">%</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="submit" class="w-full h-[38px] px-4 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <span>Pindai Ulang Red-Line</span>
+                            </button>
                         </div>
                     </div>
-
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Target Kurs USD/IDR</label>
-                        <div class="relative">
-                            <input type="number" name="usd_rate" value="{{ $usdRate }}" min="15000" max="22000" step="100"
-                                   class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" />
-                            <span class="absolute right-3 top-2 text-xs text-slate-400 font-mono">IDR</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Inflasi Biaya Input (COGS)</label>
-                        <div class="relative">
-                            <input type="number" name="cogs_inflation" value="{{ $cogsInflation }}" min="0" max="20" step="0.5"
-                                   class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" />
-                            <span class="absolute right-3 top-2 text-xs text-slate-400 font-mono">%</span>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full py-2 px-4 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        <span>Pindai Ulang Red-Line</span>
-                    </button>
                 </form>
             </div>
 
@@ -232,9 +241,14 @@
                                         <p class="text-[11px] text-rose-700 mt-0.5">{{ $item['risk_verdict'] }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <div class="text-[10px] text-slate-400 font-mono">Proyeksi NPM</div>
-                                        <div class="text-xs font-bold num-tabular text-rose-700">
-                                            {{ $item['projected_npm'] }}% <span class="text-[10px] text-slate-400 font-normal">({{ $item['npm'] }}%)</span>
+                                        <div class="text-[10px] text-slate-400 font-mono">NPM Awal &rarr; Proyeksi</div>
+                                        <div class="text-xs font-bold num-tabular text-rose-700 flex items-center justify-end gap-1">
+                                            <span class="text-slate-400 font-normal text-[11px]">{{ $item['npm'] }}%</span>
+                                            <span class="text-slate-400 font-normal">&rarr;</span>
+                                            <span class="font-extrabold text-rose-700">{{ $item['projected_npm'] }}%</span>
+                                        </div>
+                                        <div class="text-[10px] text-rose-600 font-mono font-medium">
+                                            Shock: -{{ $item['total_compression'] }}%
                                         </div>
                                     </div>
                                 </div>
@@ -267,9 +281,14 @@
                                         <p class="text-[11px] text-emerald-700 mt-0.5">{{ $item['risk_verdict'] }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <div class="text-[10px] text-slate-400 font-mono">Proyeksi NPM</div>
-                                        <div class="text-xs font-bold num-tabular text-emerald-700">
-                                            {{ $item['projected_npm'] }}% <span class="text-[10px] text-slate-400 font-normal">({{ $item['npm'] }}%)</span>
+                                        <div class="text-[10px] text-slate-400 font-mono">NPM Awal &rarr; Proyeksi</div>
+                                        <div class="text-xs font-bold num-tabular text-emerald-700 flex items-center justify-end gap-1">
+                                            <span class="text-slate-400 font-normal text-[11px]">{{ $item['npm'] }}%</span>
+                                            <span class="text-slate-400 font-normal">&rarr;</span>
+                                            <span class="font-extrabold text-emerald-700">{{ $item['projected_npm'] }}%</span>
+                                        </div>
+                                        <div class="text-[10px] text-emerald-600 font-mono font-medium">
+                                            Shock: -{{ $item['total_compression'] }}%
                                         </div>
                                     </div>
                                 </div>
@@ -283,8 +302,8 @@
             </div>
 
             <!-- 4. Sector-Level Vulnerability Concentration Breakdown -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs" x-data="{ showAllSectors: false }">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-purple-600"></span>
@@ -292,12 +311,22 @@
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">Persentase emiten dalam sektor yang melanggar batas aman solvabilitas/laba</p>
                     </div>
-                    <span class="text-[11px] font-mono text-slate-400">Diurutkan: Risiko Tertinggi &rarr; Terendah</span>
+                    <div class="flex items-center gap-3">
+                        <button type="button" @click="showAllSectors = !showAllSectors" 
+                                class="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl border border-blue-200 transition-all flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                            <span x-text="showAllSectors ? 'Tampilkan 6 Teratas' : 'Lihat Seluruh 11 Sektor (' + {{ count($sectorRiskMap) }} + ')'"></span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    @foreach($sectorRiskMap as $sec)
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between gap-2">
+                    @foreach($sectorRiskMap as $index => $sec)
+                        <div x-show="showAllSectors || {{ $index }} < 6" 
+                             x-cloak
+                             class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between gap-2 transition-all">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-800 truncate">{{ $sec['sector_name'] }}</span>
                                 <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded {{ $sec['red_ratio'] > 40 ? 'bg-rose-100 text-rose-800' : ($sec['red_ratio'] > 0 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">
@@ -352,7 +381,7 @@
                         <select name="sector_filter" onchange="this.form.submit()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 font-medium max-w-[160px]">
                             <option value="all">Semua Sektor</option>
                             @foreach($allSectors as $s)
-                                <option value="{{ $s->sector_code }}" {{ $sectorFilter === $s->sector_code ? 'selected' : '' }}>
+                                <option value="{{ $s->sector_code }}" {{ strcasecmp($sectorFilter, $s->sector_code) === 0 ? 'selected' : '' }}>
                                     {{ $s->sector_name }}
                                 </option>
                             @endforeach
@@ -364,6 +393,13 @@
                             <option value="projected_npm_asc" {{ $sortBy === 'projected_npm_asc' ? 'selected' : '' }}>Proyeksi NPM Terendah</option>
                             <option value="der_desc" {{ $sortBy === 'der_desc' ? 'selected' : '' }}>DER (Utang) Tertinggi</option>
                             <option value="market_cap_desc" {{ $sortBy === 'market_cap_desc' ? 'selected' : '' }}>Market Cap Terbesar</option>
+                        </select>
+
+                        <!-- Per Page Dropdown -->
+                        <select name="per_page" onchange="this.form.submit()" class="bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-slate-700 font-medium">
+                            <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10 / hal</option>
+                            <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25 / hal</option>
+                            <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>Semua (50)</option>
                         </select>
                     </form>
                 </div>
@@ -385,7 +421,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            @forelse($filteredCompanies as $c)
+                            @forelse($paginatedCompanies as $c)
                                 <tr class="hover:bg-slate-50/80 transition-colors">
                                     <td class="py-3 px-4">
                                         <div class="flex flex-col">
@@ -439,6 +475,55 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination Footer Bar -->
+                @if($paginatedCompanies->total() > 0)
+                    <div class="p-4 border-t border-slate-200 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                        <div class="text-slate-600 font-medium">
+                            Menampilkan <span class="font-extrabold text-slate-900">{{ $paginatedCompanies->firstItem() }}</span> &ndash; <span class="font-extrabold text-slate-900">{{ $paginatedCompanies->lastItem() }}</span> dari <span class="font-extrabold text-slate-900">{{ $paginatedCompanies->total() }}</span> emiten terpindai
+                        </div>
+
+                        <!-- Pagination Navigation Buttons -->
+                        @if($paginatedCompanies->hasPages())
+                            <div class="flex items-center gap-1.5">
+                                {{-- Previous Button --}}
+                                @if ($paginatedCompanies->onFirstPage())
+                                    <span class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-300 bg-slate-100 cursor-not-allowed text-xs font-semibold">
+                                        &larr; Prev
+                                    </span>
+                                @else
+                                    <a href="{{ $paginatedCompanies->previousPageUrl() }}" class="px-2.5 py-1.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-100 transition-all text-xs font-semibold">
+                                        &larr; Prev
+                                    </a>
+                                @endif
+
+                                {{-- Page Number Links --}}
+                                @foreach ($paginatedCompanies->getUrlRange(1, $paginatedCompanies->lastPage()) as $pageNumber => $url)
+                                    @if ($pageNumber == $paginatedCompanies->currentPage())
+                                        <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-xs shadow-xs">
+                                            {{ $pageNumber }}
+                                        </span>
+                                    @else
+                                        <a href="{{ $url }}" class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-100 transition-all text-xs font-semibold">
+                                            {{ $pageNumber }}
+                                        </a>
+                                    @endif
+                                @endforeach
+
+                                {{-- Next Button --}}
+                                @if ($paginatedCompanies->hasMorePages())
+                                    <a href="{{ $paginatedCompanies->nextPageUrl() }}" class="px-2.5 py-1.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-100 transition-all text-xs font-semibold">
+                                        Next &rarr;
+                                    </a>
+                                @else
+                                    <span class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-300 bg-slate-100 cursor-not-allowed text-xs font-semibold">
+                                        Next &rarr;
+                                    </span>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                @endif
             </div>
 
             <!-- 6. Regulatory Disclaimer -->
