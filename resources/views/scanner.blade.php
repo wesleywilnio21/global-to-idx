@@ -437,7 +437,7 @@
             </div>
 
             <!-- 5. CORE EMITEN SCREENING TABLE (Spacious 6-Column Institutional Layout) -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div id="daftar-emiten" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden scroll-mt-24">
                 <!-- Table Filter & Search Header -->
                 <div class="p-6 border-b border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
@@ -451,7 +451,7 @@
                     </div>
 
                     <!-- Filters & Sort -->
-                    <form method="GET" action="{{ route('scanner.index') }}" class="flex flex-wrap items-center gap-2.5 text-xs">
+                    <form method="GET" action="{{ route('scanner.index') }}#daftar-emiten" class="flex flex-wrap items-center gap-2.5 text-xs">
                         <input type="hidden" name="rate_hike" value="{{ $rateHike }}">
                         <input type="hidden" name="usd_rate" value="{{ $usdRate }}">
                         <input type="hidden" name="cogs_inflation" value="{{ $cogsInflation }}">
@@ -655,5 +655,19 @@
         </main>
     </div>
 
+    <!-- Script to maintain position at table on pagination/filter -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (window.location.hash === '#daftar-emiten' || urlParams.has('page')) {
+                const tableEl = document.getElementById('daftar-emiten');
+                if (tableEl) {
+                    setTimeout(function () {
+                        tableEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 60);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
