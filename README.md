@@ -6,15 +6,15 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.5-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
 [![AI Engine](https://img.shields.io/badge/AI-Gemini%203.1%20Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
-[![Test Suite](https://img.shields.io/badge/Tests-35%20Passed%20%7C%20258%20Assertions-10B981?style=for-the-badge&logo=checkmarx&logoColor=white)](tests)
+[![Test Suite](https://img.shields.io/badge/Tests-45%20Passed%20%7C%20376%20Assertions-10B981?style=for-the-badge&logo=checkmarx&logoColor=white)](tests)
 [![Dataset](https://img.shields.io/badge/Coverage-11%20Sektor%20%7C%2049%20Emiten-6366F1?style=for-the-badge)](database)
 [![Hackathon](https://img.shields.io/badge/Event-Sectors%20Hackathon%202026-F59E0B?style=for-the-badge)](https://sectors.app)
 
 <p align="center">
-  <b>Platform simulasi transmisi makroekonomi, stress-test portofolio multiaset, deteksi kebobolan solvabilitas emiten (EWS), dan validasi backtest historis pasar modal Indonesia.</b>
+  <b>Platform simulasi transmisi makroekonomi, stress-test portofolio multiaset, deteksi kebobolan solvabilitas emiten (EWS), validasi backtest historis, dan asisten AI Copilot sadar-konteks untuk pasar modal Indonesia.</b>
 </p>
 
-[Fitur Unggulan](#-6-modul-analisis-utama) •
+[Fitur Unggulan](#-7-fitur-analisis-utama) •
 [Validasi Empiris](#-validasi-empiris-model-ai) •
 [Arsitektur Sistem](#-arsitektur-sistem--data-flow) •
 [Panduan Instalasi](#-panduan-instalasi-cepat) •
@@ -36,7 +36,7 @@ Dalam analisis pasar modal tradisional di Bursa Efek Indonesia (BEI), investor r
 
 ---
 
-## 🚀 6 Modul Analisis Utama
+## 🚀 7 Fitur Analisis Utama
 
 ```
 MacroSectors AI Platform Architecture
@@ -46,7 +46,8 @@ MacroSectors AI Platform Architecture
 ├── 3. ⚔️ Head-to-Head Duel ────────────── Komparasi defensifitas makro antar emiten / sektor
 ├── 4. 📄 Institutional Tear-Sheet ──────── Riset pasar siap cetak format A4 PDF perbankan
 ├── 5. 🚨 Red-Line Scanner (EWS) ────────── Pindai kebobolan laba & solvabilitas 49 emiten
-└── 6. ⏳ Kilas Balik Krisis ────────────── Validasi backtest empiris (Taper Tantrum, Covid-19, dll.)
+├── 6. ⏳ Kilas Balik Krisis ────────────── Validasi backtest empiris (Taper Tantrum, Covid-19, dll.)
+└── 7. ✨ AI Macro Copilot (Ctrl+K) ────── Asisten AI sadar-konteks (Google Gemini + Fallback)
 ```
 
 ### 1. 📊 Dashboard Transmisi Makro (11 Sektor IHSG)
@@ -83,6 +84,17 @@ MacroSectors AI Platform Architecture
   3. *Crash Pandemi Covid-19 2020* (PSBB & lockdown, IHSG anjlok -37.5%, USD/IDR menyentuh Rp16.575).
 - **Matriks Komparasi 11 Sektor**: Grafik batang perbandingan side-by-side **Realita Historis BEI** vs **Prediksi Model AI**.
 - **Pelajaran AI Retrospektif**: Analisis pembelajaran krisis untuk strategi portofolio hari ini.
+
+### 7. ✨ AI Macro Copilot Drawer (Floating Global Hotkey `Ctrl + K`)
+- **Aksesibilitas Universal**: Selalu siap di pojok kanan bawah setiap halaman atau dibuka instan menggunakan hotkey `Ctrl + K` (Windows/Linux) / `Cmd + K` (macOS).
+- **Page-Aware Context Injection**: Asisten secara cerdas mengenali halaman yang sedang dibuka pengguna:
+  - Pada `/scanner`: Langsung mengetahui daftar emiten yang terkena *Red-Line* & rasio solvabilitasnya.
+  - Pada `/portfolio`: Menganalisis alokasi bobot saham yang sedang diuji oleh investor.
+  - Pada `/backtest`: Membedah analogi historis krisis masa lalu dengan kondisi makro riil saat ini.
+- **Dual-Engine Intelligence**:
+  - Terintegrasi langsung dengan **Google Gemini 3.1 Flash / Gemini 1.5 Flash (Google AI Studio)**.
+  - Dilengkapi **High-Fidelity Deterministic Fallback Engine** untuk menjamin respons nol-latensi dan keandalan 100% tanpa risiko kegagalan koneksi API.
+- **Quick Prompt Chips & Follow-ups**: Tombol pertanyaan 1-klik untuk evaluasi kilat dan saran pertanyaan lanjutan interaktif.
 
 ---
 
@@ -206,7 +218,7 @@ Buka browser Anda di **`http://localhost:8000`** atau port yang ditampilkan di t
 Aplikasi ini dibangun menggunakan metodologi **Test-Driven Development (TDD)** dengan cakupan pengujian komprehensif:
 
 ```bash
-# Menjalankan seluruh test suite aplikasi (35 tests, 258 assertions)
+# Menjalankan seluruh test suite aplikasi (45 tests, 376 assertions)
 php artisan test
 
 # Menjalankan linter kode standar Laravel
@@ -223,9 +235,10 @@ vendor/bin/pint --test
    PASS  Tests\Feature\MacroReportTest
    PASS  Tests\Feature\VulnerabilityScannerTest
    PASS  Tests\Feature\HistoricalBacktestTest
+   PASS  Tests\Feature\MacroCopilotTest
 
-  Tests:    35 passed (258 assertions)
-  Duration: ~3.2s
+  Tests:    45 passed (376 assertions)
+  Duration: ~3.8s
 ```
 
 ---
