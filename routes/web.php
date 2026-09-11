@@ -3,6 +3,7 @@
 use App\Http\Controllers\HeadToHeadDuelController;
 use App\Http\Controllers\HistoricalBacktestController;
 use App\Http\Controllers\MacroAnalysisController;
+use App\Http\Controllers\MacroCopilotController;
 use App\Http\Controllers\MacroReportController;
 use App\Http\Controllers\PortfolioStressTestController;
 use App\Http\Controllers\VulnerabilityScannerController;
@@ -17,6 +18,8 @@ Route::match(['get', 'post'], '/duel', [HeadToHeadDuelController::class, 'index'
 Route::get('/report', [MacroReportController::class, 'tearSheet'])->name('report.tear-sheet');
 Route::match(['get', 'post'], '/scanner', [VulnerabilityScannerController::class, 'index'])->name('scanner.index');
 Route::get('/backtest', [HistoricalBacktestController::class, 'index'])->name('backtest.index');
+
+Route::post('/api/copilot/ask', [MacroCopilotController::class, 'ask'])->name('copilot.ask');
 
 Route::get('/upload-preview', function () {
     return view('upload-preview');

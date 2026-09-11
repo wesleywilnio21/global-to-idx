@@ -130,4 +130,47 @@ class MacroCopilotTest extends TestCase
         $this->assertNotEmpty($result['answer']);
         $this->assertGreaterThanOrEqual(2, count($result['suggested_followups']));
     }
+
+    public function test_copilot_ask_endpoint_validates_required_message(): void
+    {
+        $response = $this->postJson('/api/copilot/ask', []);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['message']);
+    }
+
+    public function test_copilot_ask_endpoint_returns_successful_json_response(): void
+    {
+        Config::set('sectors.ai.gemini_api_key', '');
+
+        $response = $this->postJson('/api/copilot/ask', [
+            'message' => 'Bagaimana dampak kurs USD ke BBCA?',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        $this->assertNotEmpty($response->json('data.answer'));
+        $this->assertNotEmpty($response->json('data.engine'));
+        $this->assertIsArray($response->json('data.suggested_followups'));
+    }
+
+    public function test_copilot_ask_endpoint_handles_page_context(): void
+    {
+        Config::set('sectors.ai.gemini_api_key', '');
+
+        $response = $this->postJson('/api/copilot/ask', [
+            'message' => 'Apa emiten rentan?',
+            'page' => '/scanner',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        $this->assertStringContainsString('Scanner', $response->json('data.answer'));
+    }
 }
