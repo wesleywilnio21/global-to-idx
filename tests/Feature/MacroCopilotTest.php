@@ -173,4 +173,15 @@ class MacroCopilotTest extends TestCase
 
         $this->assertStringContainsString('Scanner', $response->json('data.answer'));
     }
+
+    public function test_macro_copilot_component_renders_without_errors(): void
+    {
+        $view = $this->blade('<x-macro-copilot />');
+
+        $view->assertSee('Tanya Macro Copilot')
+            ->assertSee('Ctrl+K')
+            ->assertSee('Macro Copilot AI')
+            ->assertSee('Pertanyaan Cepat')
+            ->assertSee('Didukung Google Gemini');
+    }
 }
