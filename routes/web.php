@@ -16,6 +16,7 @@ Route::post('/sectors/sync', [MacroAnalysisController::class, 'syncSectors'])->n
 Route::match(['get', 'post'], '/portfolio', [PortfolioStressTestController::class, 'index'])->name('portfolio.index');
 Route::match(['get', 'post'], '/duel', [HeadToHeadDuelController::class, 'index'])->name('duel.index');
 Route::get('/report', [MacroReportController::class, 'tearSheet'])->name('report.tear-sheet');
+Route::get('/tear-sheet', [MacroReportController::class, 'tearSheet'])->name('report.tear-sheet-alias');
 Route::match(['get', 'post'], '/scanner', [VulnerabilityScannerController::class, 'index'])->name('scanner.index');
 Route::get('/backtest', [HistoricalBacktestController::class, 'index'])->name('backtest.index');
 

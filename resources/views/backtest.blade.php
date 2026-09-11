@@ -572,5 +572,6 @@
             </footer>
         </main>
     </div>
+    <x-macro-copilot />
 </body>
 </html>

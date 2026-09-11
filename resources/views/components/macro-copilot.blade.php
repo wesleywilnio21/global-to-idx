@@ -1,17 +1,23 @@
 <style>
     [x-cloak] { display: none !important; }
+    @media print {
+        .macro-copilot-root,
+        .macro-copilot-root * {
+            display: none !important;
+        }
+    }
 </style>
 
 <div x-data="macroCopilotDrawer()"
      @keydown.window.ctrl.k.prevent="toggle()"
      @keydown.window.meta.k.prevent="toggle()"
      @keydown.window.escape="close()"
-     class="relative font-sans text-slate-100">
+     class="macro-copilot-root print:hidden relative font-sans text-slate-100">
 
     <!-- Floating Trigger Pill Button -->
     <button @click="toggle()"
             type="button"
-            class="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 bg-slate-900/90 hover:bg-slate-800 text-slate-100 rounded-full border border-indigo-500/40 hover:border-indigo-400 backdrop-blur shadow-xl shadow-indigo-950/30 transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            class="print:hidden fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 bg-slate-900/90 hover:bg-slate-800 text-slate-100 rounded-full border border-indigo-500/40 hover:border-indigo-400 backdrop-blur shadow-xl shadow-indigo-950/30 transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
             aria-label="Tanya Macro Copilot">
         <span class="text-base group-hover:scale-110 transition-transform">✨</span>
         <span class="text-xs font-semibold tracking-wide">Tanya Macro Copilot</span>
@@ -28,7 +34,7 @@
          x-transition:leave-end="opacity-0"
          @click="close()"
          x-cloak
-         class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs"></div>
+         class="print:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs"></div>
 
     <!-- Slide-Over Drawer Panel -->
     <div x-show="isOpen"
@@ -40,7 +46,7 @@
          x-transition:leave-end="translate-x-full"
          @click.stop
          x-cloak
-         class="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col">
+         class="print:hidden fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col">
 
         <!-- Header -->
         <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90 backdrop-blur shrink-0">

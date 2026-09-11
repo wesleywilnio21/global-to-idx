@@ -3,12 +3,22 @@
 namespace Tests\Feature;
 
 use App\Services\MacroCopilotService;
+use Database\Seeders\InitialMacroDataSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class MacroCopilotTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(InitialMacroDataSeeder::class);
+    }
+
     public function test_service_returns_structured_response_with_deterministic_fallback_when_api_key_empty(): void
     {
         Config::set('sectors.ai.gemini_api_key', '');
@@ -183,5 +193,27 @@ class MacroCopilotTest extends TestCase
             ->assertSee('Macro Copilot AI')
             ->assertSee('Pertanyaan Cepat')
             ->assertSee('Didukung Google Gemini');
+    }
+
+    public function test_macro_copilot_is_integrated_across_core_views(): void
+    {
+        $routes = [
+            '/',
+            '/scanner',
+            '/portfolio',
+            '/duel',
+            '/backtest',
+            '/tear-sheet',
+            '/report',
+        ];
+
+        foreach ($routes as $route) {
+            $response = $this->get($route);
+            $response->assertStatus(200);
+            $response->assertSee('Tanya Macro Copilot');
+            $response->assertSee('Ctrl+K');
+            $response->assertSee('Macro Copilot AI');
+            $response->assertSee('print:hidden');
+        }
     }
 }

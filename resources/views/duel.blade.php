@@ -726,5 +726,6 @@
             };
         }
     </script>
+    <x-macro-copilot />
 </body>
 </html>

@@ -433,5 +433,8 @@
         </main>
     </div>
 
+    <div class="no-print print:hidden">
+        <x-macro-copilot />
+    </div>
 </body>
 </html>
