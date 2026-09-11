@@ -177,4 +177,11 @@ class HistoricalBacktestTest extends TestCase
         $response->assertSee('LEGAL & INVESTMENT RISK DISCLAIMER');
         $response->assertSee('Wesley Wilnio');
     }
+
+    public function test_sidebar_contains_link_to_backtest(): void
+    {
+        $response = $this->get('/backtest');
+        $response->assertSee(route('backtest.index'));
+        $response->assertSee('Kilas Balik Krisis');
+    }
 }

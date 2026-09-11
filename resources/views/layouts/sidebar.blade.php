@@ -70,6 +70,16 @@
                 <span>Red-Line Scanner</span>
                 <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('scanner.*') ? 'bg-blue-500 text-white' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">EWS</span>
             </a>
+
+            <!-- 6. Kilas Balik Krisis (Historical Backtest) -->
+            <a href="{{ route('backtest.index') }}" 
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all {{ request()->routeIs('backtest.*') ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('backtest.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Kilas Balik Krisis</span>
+                <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold uppercase {{ request()->routeIs('backtest.*') ? 'bg-blue-500 text-white' : 'bg-indigo-50 text-indigo-700 border border-indigo-200' }}">Histori</span>
+            </a>
         </div>
     </div>
 
