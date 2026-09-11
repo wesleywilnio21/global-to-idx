@@ -92,4 +92,89 @@ class HistoricalBacktestTest extends TestCase
             $this->assertGreaterThanOrEqual(80, $accuracy);
         }
     }
+
+    public function test_ui_renders_header_app_bar_and_empirical_validation_badge(): void
+    {
+        $response = $this->get('/backtest');
+
+        $response->assertStatus(200);
+        $response->assertSee('Kilas Balik Krisis Historis');
+        $response->assertSee('EMPIRICAL VALIDATION');
+        $response->assertSee('window.print()', false);
+        $response->assertSee('Cetak PDF');
+        $response->assertSee('Audit Empiris BEI Terverifikasi');
+    }
+
+    public function test_ui_renders_macro_context_deck_and_scorecard_metrics(): void
+    {
+        $response = $this->get('/backtest?crisis=covid_crash_2020');
+
+        $response->assertStatus(200);
+
+        // 4 Macro Backdrop Metrics
+        $response->assertSee('Rp16.575');
+        $response->assertSee('-125 bps');
+        $response->assertSee('PDB -2.07%');
+        $response->assertSee('-37.5%');
+
+        // Model Validation Scorecard
+        $response->assertSee('Akurasi Arah Prediksi Model');
+        $response->assertSee('Directional Match');
+        $response->assertSee('Top Sektor Defensif');
+        $response->assertSee('Top Sektor Rentan');
+        $response->assertSee('10/11 Sektor Tepat');
+    }
+
+    public function test_ui_renders_comparative_11_sector_matrix_and_accuracy_badges(): void
+    {
+        $response = $this->get('/backtest?crisis=covid_crash_2020');
+
+        $response->assertStatus(200);
+
+        // Table Header & Legend
+        $response->assertSee('Komparasi Empiris: Realita Pasar BEI vs Prediksi Model AI');
+        $response->assertSee('Realita BEI');
+        $response->assertSee('Prediksi AI');
+
+        // All 11 Sectors
+        $expectedSectors = [
+            'Kesehatan',
+            'Konsumer Primer',
+            'Teknologi',
+            'Infrastruktur',
+            'Barang Baku',
+            'Energi',
+            'Keuangan',
+            'Perindustrian',
+            'Konsumer Non-Primer',
+            'Properti & Real Estat',
+            'Transportasi & Logistik',
+        ];
+
+        foreach ($expectedSectors as $sectorName) {
+            $response->assertSee($sectorName);
+        }
+
+        // Accuracy Badges
+        $response->assertSee('Bullseye (Presisi)');
+        $response->assertSee('Konsisten');
+        $response->assertSee('Divergen Minor');
+    }
+
+    public function test_ui_renders_retrospective_ai_post_mortem_and_disclaimer(): void
+    {
+        $response = $this->get('/backtest?crisis=covid_crash_2020');
+
+        $response->assertStatus(200);
+
+        // AI Post-Mortem Card
+        $response->assertSee('Retrospeksi & Pelajaran Strategis AI');
+        $response->assertSee('Bantalan Defensif Alami');
+        $response->assertSee('Disiplin Utang & Solvabilitas');
+        $response->assertSee('Likuiditas untuk Rebound');
+
+        // Regulatory Disclaimer
+        $response->assertSee('LEGAL & INVESTMENT RISK DISCLAIMER');
+        $response->assertSee('Wesley Wilnio');
+    }
 }
