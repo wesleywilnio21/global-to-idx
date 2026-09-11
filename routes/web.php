@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HeadToHeadDuelController;
+use App\Http\Controllers\HistoricalBacktestController;
 use App\Http\Controllers\MacroAnalysisController;
 use App\Http\Controllers\MacroReportController;
 use App\Http\Controllers\PortfolioStressTestController;
@@ -15,6 +16,7 @@ Route::match(['get', 'post'], '/portfolio', [PortfolioStressTestController::clas
 Route::match(['get', 'post'], '/duel', [HeadToHeadDuelController::class, 'index'])->name('duel.index');
 Route::get('/report', [MacroReportController::class, 'tearSheet'])->name('report.tear-sheet');
 Route::match(['get', 'post'], '/scanner', [VulnerabilityScannerController::class, 'index'])->name('scanner.index');
+Route::get('/backtest', [HistoricalBacktestController::class, 'index'])->name('backtest.index');
 
 Route::get('/upload-preview', function () {
     return view('upload-preview');
