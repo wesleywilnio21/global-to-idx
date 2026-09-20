@@ -45,7 +45,7 @@ class PortfolioStressTestController extends Controller
         }
 
         // Fetch sector results for this scenario, or generate dynamically if not present
-        $sectorResults = MacroAnalysisResult::with('sector')
+        $sectorResults = MacroAnalysisResult::with(['sector.companies'])
             ->where('scenario_id', $activeScenario?->id)
             ->get()
             ->keyBy(fn ($r) => $r->sector->sector_code);
@@ -74,7 +74,7 @@ class PortfolioStressTestController extends Controller
                 }
             }
 
-            $sectorResults = MacroAnalysisResult::with('sector')
+            $sectorResults = MacroAnalysisResult::with(['sector.companies'])
                 ->where('scenario_id', $activeScenario->id)
                 ->get()
                 ->keyBy(fn ($r) => $r->sector->sector_code);

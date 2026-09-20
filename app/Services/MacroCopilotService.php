@@ -82,6 +82,11 @@ class MacroCopilotService
                     }
                 } else {
                     Log::warning("Gemini Copilot API ({$model}) returned status {$response->status()}: ".substr($response->body(), 0, 150));
+
+                    // Fast-fail circuit breaker on authentication or quota errors
+                    if (in_array($response->status(), [400, 401, 403, 429], true)) {
+                        break;
+                    }
                 }
             }
         } catch (\Throwable $e) {

@@ -82,19 +82,20 @@ class MacroAnalysisController extends Controller
                     'key_takeaway' => $generated['key_takeaway'],
                     'engine_used' => $generated['engine_used'],
                 ];
+
+                $sectorResults = MacroAnalysisResult::with(['sector.companies'])
+                    ->where('scenario_id', $activeScenario->id)
+                    ->get()
+                    ->sortByDesc('impact_score');
             } else {
                 $analysisData = [
                     'executive_summary' => "Analisis dampak makroekonomi untuk skenario '{$activeScenario->title}'. Menyoroti ketahanan fundamental emiten berbasis data Sectors API.",
                     'key_takeaway' => 'Gunakan data rasio solvabilitas (DER) dan marjin laba (NPM) untuk menentukan alokasi portofolio.',
                     'engine_used' => 'MacroSectors AI Intelligence Engine (Cached)',
                 ];
-            }
 
-            // Fetch structured results for display
-            $sectorResults = MacroAnalysisResult::with(['sector.companies'])
-                ->where('scenario_id', $activeScenario->id)
-                ->get()
-                ->sortByDesc('impact_score');
+                $sectorResults = $existingResults->sortByDesc('impact_score');
+            }
         } else {
             // Neutral / Baseline State (No active macroeconomic shock applied)
             $analysisData = [
